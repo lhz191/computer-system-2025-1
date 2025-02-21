@@ -27,16 +27,18 @@ char* rl_gets() {
   return line_read;
 }
 
-static int cmd_c(char *args) {
-  cpu_exec(-1);
-  return 0;
-}
+// static int cmd_c(char *args) {
+//   cpu_exec(-1);
+//   return 0;
+// }
 
-static int cmd_q(char *args) {
-  return -1;
-}
-
+// static int cmd_q(char *args) {
+//   return -1;
+// }
+/*PA1 part1 Begin*/
 static int cmd_help(char *args);
+static int cmd_si(char *args); // 声明 cmd_si
+/*PA1 part1 End*/
 
 static struct {
   char *name;
@@ -48,7 +50,9 @@ static struct {
   { "q", "Exit NEMU", cmd_q },
 
   /* TODO: Add more commands */
-
+  /*PA1 part1 Begin*/
+  { "si", "Execute N instructions step by step", cmd_si }, // 添加si命令
+  /*PA1 part1 End*/
 };
 
 #define NR_CMD (sizeof(cmd_table) / sizeof(cmd_table[0]))
@@ -56,15 +60,16 @@ static struct {
 static int cmd_help(char *args) {
   /* extract the first argument */
   char *arg = strtok(NULL, " ");
+  //strtok函数的第一个参数为NULL，表示继续从上一次分割的位置继续分割
   int i;
 
-  if (arg == NULL) {
+  if (arg == NULL) {//简单的输入help
     /* no argument given */
     for (i = 0; i < NR_CMD; i ++) {
       printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
     }
   }
-  else {
+  else {//输入help si，help q等内容
     for (i = 0; i < NR_CMD; i ++) {
       if (strcmp(arg, cmd_table[i].name) == 0) {
         printf("%s - %s\n", cmd_table[i].name, cmd_table[i].description);
@@ -75,6 +80,33 @@ static int cmd_help(char *args) {
   }
   return 0;
 }
+
+
+/*PA1 part1 si Begin*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+static int cmd_si(char *args)
+{
+  /* extract the first argument */
+  char *arg = strtok(NULL, " ");
+  //strtok函数的第一个参数为NULL，表示继续从上一次分割的位置继续分割
+  if(arg == NULL) {//简单的输入si
+    cpu_exec(1); // 执行1条指令
+    return 0;
+  }
+  else{
+    int n=atoi(arg);
+    if (n < 1) {
+      printf("Invalid number of instructions to execute: %d\n", n);
+      return 0;
+    }
+    cpu_exec(n); // 执行n条指令
+  }
+  return 0;
+}
+/*PA1 part1 si End*/
 
 void ui_mainloop(int is_batch_mode) {
   if (is_batch_mode) {
