@@ -15,10 +15,12 @@ enum { R_AL, R_CL, R_DL, R_BL, R_AH, R_CH, R_DH, R_BH };
  */
 
 typedef struct {
-  struct {
-    uint32_t _32;
-    uint16_t _16;
-    uint8_t _8[2];
+  union {
+/*union 允许多个数据类型共享同一块内存。这意味着在任何时刻，只能使用其中一个成员。比如，在寄存器的情况下，只需要在某个时刻使用 32 位、16 位或 8 位中的一个，而不是同时使用它们。*/
+    union {
+      uint32_t _32; // 32-bit register
+      uint16_t _16; // 16-bit register
+      uint8_t _8[2]; // 8-bit registers
   } gpr[8];
 
   /* Do NOT change the order of the GPRs' definitions. */
@@ -26,7 +28,18 @@ typedef struct {
   /* In NEMU, rtlreg_t is exactly uint32_t. This makes RTL instructions
    * in PA2 able to directly access these registers.
    */
-  rtlreg_t eax, ecx, edx, ebx, esp, ebp, esi, edi;
+  struct {
+/*struct 允许同时存储多个不同类型的数据。对于寄存器来说，使用 struct 可以直接通过名称访问特定的寄存器（如 eax、ecx 等），而不需要记住它们在数组中的位置。*/
+      rtlreg_t eax; // 32-bit register
+      rtlreg_t ecx; // 32-bit register
+      rtlreg_t edx; // 32-bit register
+      rtlreg_t ebx; // 32-bit register
+      rtlreg_t esp; // 32-bit register
+      rtlreg_t ebp; // 32-bit register
+      rtlreg_t esi; // 32-bit register
+      rtlreg_t edi; // 32-bit register
+   };
+ };
 
   vaddr_t eip;
 
