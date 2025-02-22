@@ -130,7 +130,7 @@ static int cmd_info(char *args) {
     // printf("ecx: 0x%08x\n", cpu.ecx);
     // printf("eax: 0x%08x\n", cpu.eax);
     //经测试，直接print cpu.ecx与reg_l的结果相同，证明实现正确
-    printf("eip: 0x%08x\n", cpu.eip);
+    printf("eip: 0x%08x\n", cpu.eip);//完善修改PA1.1，解决监视eip报错的bug，eip可以作为监视点
   } else if (strcmp(arg, "w") == 0) {
     // 打印监视点信息
     print_watchpoints();  // 调用函数
