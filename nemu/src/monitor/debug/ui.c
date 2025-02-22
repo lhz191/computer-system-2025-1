@@ -35,12 +35,15 @@ static int cmd_c(char *args) {
 static int cmd_q(char *args) {
   return -1;
 }
+
 /*PA1 part1 Begin*/
 static int cmd_help(char *args);
 static int cmd_si(char *args); // 声明 cmd_si
 static int cmd_info(char *args);//声明cmd_info
 static int cmd_watch(char *args); // 声明 cmd_watch
 static int cmd_delete(char *args);//声明cmd_delete
+static int cmd_p(char *args); // 声明 cmd_p
+static int cmd_x(char *args); // 声明 cmd_x
 /*PA1 part1 End*/
 
 static struct {
@@ -56,6 +59,8 @@ static struct {
   /*PA1 part1 Begin*/
   { "si", "Execute N instructions step by step", cmd_si }, // 添加si命令
   { "info", "Print program status", cmd_info }, // 添加info命令
+  { "p", "Evaluate an expression", cmd_p }, // 添加 p 命令
+  { "x", "Scan memory", cmd_x }, // 添加 x 命令
   { "w", "Set a watchpoint", cmd_watch },
   { "d", "Delete a watchpoint", cmd_delete }, 
   /*PA1 part1 End*/
@@ -86,8 +91,6 @@ static int cmd_help(char *args) {
   }
   return 0;
 }
-
-
 /*PA1 part1 si Begin*/
 #include <stdio.h>
 #include <stdlib.h>
@@ -130,7 +133,7 @@ static int cmd_info(char *args) {
     // printf("ecx: 0x%08x\n", cpu.ecx);
     // printf("eax: 0x%08x\n", cpu.eax);
     //经测试，直接print cpu.ecx与reg_l的结果相同，证明实现正确
-    printf("eip: 0x%08x\n", cpu.eip);//完善修改PA1.1，解决监视eip报错的bug，eip可以作为监视点
+    printf("eip: 0x%08x\n", cpu.eip);
   } else if (strcmp(arg, "w") == 0) {
     // 打印监视点信息
     print_watchpoints();  // 调用函数
@@ -221,4 +224,54 @@ void ui_mainloop(int is_batch_mode) {
 
     if (i == NR_CMD) { printf("Unknown command '%s'\n", cmd); }
   }
+}
+
+
+static int cmd_p(char *args) {
+  if (args == NULL) {
+    printf("Usage: p EXPR\n");
+    return 0;
+  }
+
+  bool success = true;
+  uint32_t result = expr(args, &success);
+  if (success) {
+    printf("Result: %u (0x%x)\n", result, result);
+  } else {
+    printf("Failed to evaluate expression: %s\n", args);
+  }
+  return 0;
+}
+
+static int cmd_x(char *args) {
+  if (args == NULL) {
+    printf("Usage: x N EXPR\n");
+    return 0;
+  }
+
+  char *n_str = strtok(args, " ");
+  char *expr_str = strtok(NULL, " ");
+  if (n_str == NULL || expr_str == NULL) {
+    printf("Usage: x N EXPR\n");
+    return 0;
+  }
+
+  int n = atoi(n_str);
+  if (n <= 0) {
+    printf("Invalid number of units: %d\n", n);
+    return 0;
+  }
+
+  bool success = true;
+  uint32_t start_addr = expr(expr_str, &success);
+  if (!success) {
+    printf("Failed to evaluate expression: %s\n", expr_str);
+    return 0;
+  }
+
+  for (int i = 0; i < n; i++) {
+    uint32_t data = vaddr_read(start_addr + i * 4, 4);
+    printf("0x%08x: 0x%08x\n", start_addr + i * 4, data);
+  }
+  return 0;
 }
