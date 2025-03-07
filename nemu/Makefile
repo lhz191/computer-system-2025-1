@@ -52,3 +52,10 @@ gdb: $(BINARY)
 
 clean: 
 	rm -rf $(BUILD_DIR)
+
+.PHONY: count
+count:
+	@echo "Total lines (including empty lines):"
+	@find . -name "*.c" -o -name "*.h" | xargs wc -l
+	@echo "Total lines (excluding empty lines):"
+	@find . -name "*.c" -o -name "*.h" | xargs grep -v '^\s*$$' | wc -l
