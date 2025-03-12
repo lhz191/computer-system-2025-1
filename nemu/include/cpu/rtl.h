@@ -134,9 +134,22 @@ static inline void rtl_not(rtlreg_t* dest) {
   TODO();
 }
 
+/*对于8位到32位的符号扩展：最高位是1则扩展后高位全为1，否则则高位全为0
+如果8位数是0x7f(01111111)，扩展后是0x0000007f
+如果8位数是0x81(10000001)，扩展后是0xffffff81
+*/
 static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
-  TODO();
+  // 根据源操作数的宽度进行符号扩展
+  
+  // 首先获取源操作数的有效位
+  *dest = *src1 & ((1u << (width * 8)) - 1);
+  
+  // 如果最高位是1，需要进行符号扩展
+  if (*dest & (1u << (width * 8 - 1))) {
+    // 将高位全部置为1
+    *dest |= (~0u) << (width * 8);
+  }
 }
 
 static inline void rtl_push(const rtlreg_t* src1) {
