@@ -183,10 +183,35 @@ static inline void rtl_update_SF(const rtlreg_t* result, int width) {
   // eflags.SF <- is_sign(result[width * 8 - 1 .. 0])
   TODO();
 }
-
+/*Pa2.1 Begin*/
 static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {
-  rtl_update_ZF(result, width);
-  rtl_update_SF(result, width);
+  // 更新ZF (Zero Flag)
+  rtl_eq0(&t0, result);    // 检查结果是否为0
+  rtl_set_ZF(&t0);         // 如果结果为0，设置ZF=1
+
+  // 更新SF (Sign Flag)
+  rtl_msb(&t0, result, width);  // 获取结果的最高位（符号位）
+  rtl_set_SF(&t0);             // 如果最高位为1（负数），设置SF=1
 }
 
+// // CF (Carry Flag): 表示无符号运算是否产生进位
+// static inline void rtl_set_CF(const rtlreg_t* src) {
+//   cpu.eflags.CF = *src;
+// }
+
+// // OF (Overflow Flag): 表示有符号运算是否溢出
+// static inline void rtl_set_OF(const rtlreg_t* src) {
+//   cpu.eflags.OF = *src;
+// }
+
+// // ZF (Zero Flag): 表示结果是否为0
+// static inline void rtl_set_ZF(const rtlreg_t* src) {
+//   cpu.eflags.ZF = *src;
+// }
+
+// // SF (Sign Flag): 表示结果是否为负数
+// static inline void rtl_set_SF(const rtlreg_t* src) {
+//   cpu.eflags.SF = *src;
+// }
+/*Pa2.1 End*/
 #endif
