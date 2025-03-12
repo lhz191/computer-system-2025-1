@@ -25,6 +25,7 @@ make_EHelper(lea);
 make_EHelper(push);
 make_EHelper(pop);  // 添加pop指令声明
 make_EHelper(xor);  // 添加xor指令声明
+make_EHelper(movsx);  // 添加movsx指令声明
 /*Pa2.1 end*/
 
 
