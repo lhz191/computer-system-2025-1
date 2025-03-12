@@ -13,8 +13,11 @@ make_EHelper(push) {
   print_asm_template1(push);
 }
 
+/*Pa2.1 0x5d pop %ebp指令*/
 make_EHelper(pop) {
-  TODO();
+  // 从栈中弹出数据到目标操作数
+  rtl_pop(&t2);
+  operand_write(id_dest, &t2);
 
   print_asm_template1(pop);
 }

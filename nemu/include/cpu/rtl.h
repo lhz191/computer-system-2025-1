@@ -148,10 +148,12 @@ static inline void rtl_push(const rtlreg_t* src1) {
   /*Pa2.1 end*/
 }
 
+ //Pa2.1 0x5d pop %ebp指令。
 static inline void rtl_pop(rtlreg_t* dest) {
   // dest <- M[esp]
   // esp <- esp + 4
-  TODO();
+  rtl_lm(dest, &cpu.esp, 4);  // 从栈顶读取4字节数据
+  cpu.esp += 4;  // 栈指针加4
 }
 /*Pa2.1 Begin*/
 
