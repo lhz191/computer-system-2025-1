@@ -7,7 +7,20 @@ make_EHelper(test) {
 }
 
 make_EHelper(and) {
-  TODO();
+  /*Pa2.1 Begin*/
+  // 执行与运算,使用rtl_and执行按位与操作
+  rtl_and(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);//将结果写回目标操作数
+
+  // 更新标志位,ZF和SF根据结果更新，
+  //零标志和符号标志都需要根据操作数宽度进行
+  rtl_update_ZFSF(&t2, id_dest->width);
+  
+  // AND指令会清除OF和CF标志位（AND指令的特性），逻辑运算不存在进位，也不存在溢出
+  rtl_li(&t0, 0);
+  rtl_set_CF(&t0);
+  rtl_set_OF(&t0);
+  /*Pa2.1 End*/
 
   print_asm_template2(and);
 }
