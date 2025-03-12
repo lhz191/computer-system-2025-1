@@ -142,7 +142,10 @@ static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
 static inline void rtl_push(const rtlreg_t* src1) {
   // esp <- esp - 4
   // M[esp] <- src1
-  TODO();
+  /*Pa2.1 Begin*/
+  cpu.esp -= 4;//将栈指针esp减4（因为是32位系统，每个数据占4字节）
+  rtl_sm(&cpu.esp, 4, src1);//将src1指向的数据写入新的栈顶位置
+  /*Pa2.1 end*/
 }
 
 static inline void rtl_pop(rtlreg_t* dest) {
