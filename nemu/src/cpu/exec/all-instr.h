@@ -10,7 +10,7 @@ make_EHelper(nemu_trap);
 
 
 /*Pa2.1 begin*/
-// 添加指令的声明
+// 添加sub指令的声明
 // Group 1 instructions
 make_EHelper(add);
 make_EHelper(or);
@@ -19,4 +19,9 @@ make_EHelper(and);
 make_EHelper(sub);
 make_EHelper(xor);
 make_EHelper(cmp);
+
+
+make_EHelper(lea);
+
 /*Pa2.1 end*/
+
