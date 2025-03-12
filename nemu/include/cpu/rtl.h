@@ -153,45 +153,49 @@ static inline void rtl_pop(rtlreg_t* dest) {
   // esp <- esp + 4
   TODO();
 }
+/*Pa2.1 Begin*/
 
+// 检查值是否为0，结果存入dest
 static inline void rtl_eq0(rtlreg_t* dest, const rtlreg_t* src1) {
-  // dest <- (src1 == 0 ? 1 : 0)
-  TODO();
+  *dest = (*src1 == 0) ? 1 : 0;
 }
 
+// 检查值是否等于立即数imm
 static inline void rtl_eqi(rtlreg_t* dest, const rtlreg_t* src1, int imm) {
-  // dest <- (src1 == imm ? 1 : 0)
-  TODO();
+  *dest = (*src1 == imm) ? 1 : 0;
 }
 
+// 检查值是否不为0
 static inline void rtl_neq0(rtlreg_t* dest, const rtlreg_t* src1) {
-  // dest <- (src1 != 0 ? 1 : 0)
-  TODO();
+  *dest = (*src1 != 0) ? 1 : 0;
 }
 
+// 获取src1指定宽度的最高位（符号位）
 static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
-  // dest <- src1[width * 8 - 1]
-  TODO();
+  *dest = (*src1 >> (width * 8 - 1)) & 0x1;
 }
 
+// 根据运算结果更新ZF标志位
 static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
-  // eflags.ZF <- is_zero(result[width * 8 - 1 .. 0])
-  TODO();
+  rtl_eq0(&t0, result);
+  rtl_set_ZF(&t0);
 }
 
+// 根据运算结果更新SF标志位
 static inline void rtl_update_SF(const rtlreg_t* result, int width) {
-  // eflags.SF <- is_sign(result[width * 8 - 1 .. 0])
-  TODO();
+  rtl_msb(&t0, result, width);
+  rtl_set_SF(&t0);
 }
+/*Pa2.1 End*/
+
 /*Pa2.1 Begin*/
 static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {
-  // 更新ZF (Zero Flag)
-  rtl_eq0(&t0, result);    // 检查结果是否为0
-  rtl_set_ZF(&t0);         // 如果结果为0，设置ZF=1
-
-  // 更新SF (Sign Flag)
-  rtl_msb(&t0, result, width);  // 获取结果的最高位（符号位）
-  rtl_set_SF(&t0);             // 如果最高位为1（负数），设置SF=1
+  // 更新ZF
+  rtl_eq0(&t0, result);
+  rtl_set_ZF(&t0);
+  // 更新SF (检查最高位)
+  rtl_msb(&t0, result, width);
+  rtl_set_SF(&t0);
 }
 
 // // CF (Carry Flag): 表示无符号运算是否产生进位
