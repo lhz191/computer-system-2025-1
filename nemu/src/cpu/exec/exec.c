@@ -137,8 +137,9 @@ opcode_entry opcode_table [512] = {
   /*Pa2.1 0x68:push imm32*/
   /*Pa2.1 0x6a：push imm8*/
   /*I是一个解码器（decoder），用于处理立即数（Immediate）操作数。make_DopHelper(I) */
-  /*IDEX(I, push)：解码32位立即数，IDEXW(I, push, 1)：解码8位立即数*/
-  /* 0x68 */	IDEX(I, push), IDEXW(I, push, 1), EMPTY, EMPTY,  // 0x6a: push imm8
+  /*IDEX(I, push)：解码32位立即数，IDEXW(SI, push, 1)：解码8位立即数*/
+  // 0x6a: push imm8 with sign extension
+  /* 0x68 */	IDEX(I, push), EMPTY, IDEXW(SI, push, 1), EMPTY, 
   /* 0x6c */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x70 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x74 */	EMPTY, EMPTY, EMPTY, EMPTY,
