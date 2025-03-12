@@ -110,10 +110,22 @@ opcode_entry opcode_table [512] = {
   /* 0x44 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x48 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x4c */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0x50 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /*Pa2.1
+  通过查看x86指令集手册得知的。在x86架构中：
+  0x50-0x57这个范围的操作码专门用于push寄存器指令：
+  0x50: push %eax
+  0x51: push %ecx
+  0x52: push %edx
+  0x53: push %ebx
+  0x54: push %esp
+  0x55: push %ebp
+  0x56: push %esi
+  0x57: push %edi
+  Pa2.1*/
+  /* 0x50 */	IDEX(r, push), IDEX(r, push), IDEX(r, push), IDEX(r, push),
   /*Pa2.1 Begin*/
   // 0x55 是 push ebp
-  /* 0x54 */	EMPTY, IDEX(r, push), EMPTY, EMPTY,
+  /* 0x54 */	IDEX(r, push), IDEX(r, push), IDEX(r, push), IDEX(r, push),
   /*Pa2.1 End*/
   /* 0x58 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x5c */	EMPTY, EMPTY, EMPTY, EMPTY,
