@@ -24,9 +24,19 @@ make_EHelper(and) {
 
   print_asm_template2(and);
 }
-
+/*Pa2.1 xor运算*/
 make_EHelper(xor) {
-  TODO();
+  // 执行异或运算
+  rtl_xor(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);
+
+  // 更新标志位，这里与之前的and基本类似，原理也相同，都是逻辑运算
+  rtl_update_ZFSF(&t2, id_dest->width);
+  
+  // XOR指令会清除OF和CF标志位
+  rtl_li(&t0, 0);
+  rtl_set_CF(&t0);
+  rtl_set_OF(&t0);
 
   print_asm_template2(xor);
 }
