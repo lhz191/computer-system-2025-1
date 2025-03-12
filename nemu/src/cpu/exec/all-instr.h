@@ -22,6 +22,8 @@ make_EHelper(cmp);
 
 
 make_EHelper(lea);
-
+make_EHelper(push);
 /*Pa2.1 end*/
+
+
 
