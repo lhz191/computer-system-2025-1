@@ -1,7 +1,27 @@
 #include "cpu/exec.h"
 
+
+/*
+test指令的主要用途：
+它执行两个操作数的按位与运算，但不保存结果
+只更新标志位，常用于条件判断
+最常见的用法是test %reg, %reg，用来检查寄存器是否为0
+*/
 make_EHelper(test) {
-  TODO();
+  // 1. 执行按位与操作，结果存储在t2中
+  rtl_and(&t2, &id_dest->val, &id_src->val);
+  
+  // 2. 更新ZF和SF标志位
+  // ZF(Zero Flag): 如果结果为0，则ZF=1；否则ZF=0
+  // SF(Sign Flag): 如果结果为负数（最高位为1），则SF=1；否则SF=0
+  rtl_update_ZFSF(&t2, id_dest->width);
+  
+  // 3. 清除CF和OF标志位
+  // CF(Carry Flag): 设置为0，因为逻辑运算不产生进位
+  // OF(Overflow Flag): 设置为0，因为逻辑运算不会溢出
+  rtl_li(&t0, 0);
+  rtl_set_CF(&t0);
+  rtl_set_OF(&t0);
 
   print_asm_template2(test);
 }

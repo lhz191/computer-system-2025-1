@@ -147,7 +147,8 @@ opcode_entry opcode_table [512] = {
   /* 0x78 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x7c */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x80 */	IDEXW(I2E, gp1, 1), IDEX(I2E, gp1), EMPTY, IDEX(SI2E, gp1),
-  /* 0x84 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /*Pa2.1 0x84 c0 test %al,%al*/
+  /* 0x84 */	IDEXW(G2E, test, 1), IDEX(G2E, test), EMPTY, EMPTY,
   /* 0x88 */	IDEXW(mov_G2E, mov, 1), IDEX(mov_G2E, mov), IDEXW(mov_E2G, mov, 1), IDEX(mov_E2G, mov),
   /*Pa2.1 Begin*/
   /* 0x8c */	EMPTY, IDEX(lea_M2G, lea), EMPTY, EMPTY,  // 0x8d是lea指令
