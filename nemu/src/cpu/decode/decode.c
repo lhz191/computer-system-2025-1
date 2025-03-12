@@ -29,7 +29,7 @@ static inline make_DopHelper(I) {
 /* sign immediate */
 static inline make_DopHelper(SI) {
   assert(op->width == 1 || op->width == 4);
-
+  //首先确保操作数宽度是合法的（1或4字节）
   op->type = OP_TYPE_IMM;
 
   /* TODO: Use instr_fetch() to read `op->width' bytes of memory
@@ -38,8 +38,13 @@ static inline make_DopHelper(SI) {
    *
    op->simm = ???
    */
-  TODO();
-
+  // TODO();
+  //使用instr_fetch()从eip指向的内存读取指定宽度的数据
+  //将读取的数据作为有符号立即数存储在op->simm中
+  //simm表示signed immediate，有符号立即数
+  op->simm = instr_fetch(eip, op->width);
+  
+  // 根据操作数宽度进行符号扩展，使用RTL指令将立即数加载到操作数的val字段中
   rtl_li(&op->val, op->simm);
 
 #ifdef DEBUG
