@@ -6,8 +6,10 @@ make_EHelper(mov) {
 }
 
 make_EHelper(push) {
-  TODO();
-
+  /*Pa2.1 Begin*/
+  // 将操作数压入栈中
+  rtl_push(&id_dest->val);
+  /*Pa2.1 End*/
   print_asm_template1(push);
 }
 

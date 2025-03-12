@@ -52,5 +52,6 @@ static inline const char* get_cc_name(int subcode) {
 
 /*Pa2.1 begin*/
 make_EHelper(call);
+make_EHelper(push);
 /*Pa2.1 end*/
 #endif
