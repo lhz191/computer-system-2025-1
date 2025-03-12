@@ -65,10 +65,12 @@ make_group(gp4,
     EMPTY, EMPTY, EMPTY, EMPTY,
     EMPTY, EMPTY, EMPTY, EMPTY)
 
-  /* 0xff */
+/*Pa2.1 Begin*/
+/* 0xff */
 make_group(gp5,
-    EMPTY, EMPTY, EMPTY, EMPTY,
+    EX(push), EMPTY, EMPTY, EMPTY,  // 0xff /6 是push指令
     EMPTY, EMPTY, EMPTY, EMPTY)
+/*Pa2.1 End*/
 
   /* 0x0f 0x01*/
 make_group(gp7,
