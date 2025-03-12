@@ -24,11 +24,30 @@ make_EHelper(sub) {
   print_asm_template2(sub);
 }
 
+/*Pa2.1 cmp imm8 to r/m8 Begin*/
 make_EHelper(cmp) {
-  TODO();
+  //执行减法运算，但不保存结果，实现和sub指令类似，只是不保存结果
+  rtl_sub(&t2, &id_dest->val, &id_src->val);
+//只更新标志位，用于后续的条件跳转
+  // 更新标志位
+  rtl_update_ZFSF(&t2, id_dest->width);
+
+  // 设置CF标志位
+  rtl_sltu(&t0, &id_dest->val, &t2);
+  rtl_set_CF(&t0);
+
+  // 设置OF标志位
+  rtl_xor(&t0, &id_dest->val, &id_src->val);
+  rtl_xor(&t1, &id_dest->val, &t2);
+  rtl_and(&t0, &t0, &t1);
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
 
   print_asm_template2(cmp);
 }
+/*Pa2.1 cmp imm8 to r/m8 End*/
+
+
 
 make_EHelper(inc) {
   TODO();
