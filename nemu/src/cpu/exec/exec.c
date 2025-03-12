@@ -67,9 +67,19 @@ make_group(gp4,
 
 /*Pa2.1 Begin*/
 /* 0xff */
+/*0xff操作码使用了分组（group）的概念，
+具体执行哪个指令由ModR/M字节的reg字段（3位）决定。*/
+/*gp5组的8个位置对应reg字段的8种可能值（000~111）*/
 make_group(gp5,
-    EX(push), EMPTY, EMPTY, EMPTY,  // 0xff /6 是push指令
-    EMPTY, EMPTY, EMPTY, EMPTY)
+    EMPTY,       /* 000 */
+    EMPTY,       /* 001 */
+    EMPTY,       /* 010 */
+    EMPTY,       /* 011 */
+    EMPTY,       /* 100 */
+    EMPTY,       /* 101 */
+    EX(push),    /* 110: push指令，对应reg=6 */
+    EMPTY        /* 111 */
+)   
 /*Pa2.1 End*/
 
   /* 0x0f 0x01*/
