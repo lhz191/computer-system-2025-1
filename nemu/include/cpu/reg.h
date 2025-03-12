@@ -43,6 +43,30 @@ typedef struct {
 
   vaddr_t eip;
 
+  /* PA2.1：添加EFLAGS寄存器 */
+  /* x86架构中EFLAGS寄存器的位分布：
+ * CF在第0位
+ * OF在第11位  
+ * IF在第9位
+ * SF在第7位
+ * ZF在第6位
+ * 一共32位
+ */
+  union {
+    struct {
+      uint32_t CF : 1;      // 位0
+      uint32_t    : 1;      // 位1，保留位
+      uint32_t    : 4;      // 位2-5
+      uint32_t ZF : 1;      // 位6
+      uint32_t SF : 1;      // 位7
+      uint32_t    : 1;      // 位8
+      uint32_t IF : 1;      // 位9
+      uint32_t    : 1;      // 位10
+      uint32_t OF : 1;      // 位11
+      uint32_t    : 20;     // 位12-31
+    };
+    uint32_t eflags;
+  };
 } CPU_state;
 
 extern CPU_state cpu;
