@@ -29,6 +29,9 @@ make_EHelper(movsx);  // 添加movsx指令声明
 make_EHelper(test);  // 添加test指令声明
 make_EHelper(jcc);  // 添加jcc指令声明
 make_EHelper(cmp);  // 添加cmp指令声明
+make_EHelper(inc);  // 添加inc指令声明
+make_EHelper(dec);  // 添加dec指令声明
+make_EHelper(neg);  // 添加neg指令声明
 
 /*Pa2.1 end*/
 
