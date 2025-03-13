@@ -5,16 +5,21 @@ make_EHelper(add) {
 
   print_asm_template2(add);
 }
-
+/*Pa2.1 sub Begin*/
 make_EHelper(sub) {
   rtl_sub(&t2, &id_dest->val, &id_src->val);
+  
+  // 在写入结果前检查借位
+  rtl_sltu(&t0, &id_dest->val, &id_src->val);
+  rtl_set_CF(&t0);
+  
+  // 写入结果
   operand_write(id_dest, &t2);
 
+  // 更新ZF和SF标志位
   rtl_update_ZFSF(&t2, id_dest->width);
 
-  rtl_sltu(&t0, &id_dest->val, &t2);
-  rtl_set_CF(&t0);
-
+  // 更新OF标志位
   rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_xor(&t1, &id_dest->val, &t2);
   rtl_and(&t0, &t0, &t1);
@@ -23,18 +28,21 @@ make_EHelper(sub) {
 
   print_asm_template2(sub);
 }
+/*Pa2.1 sub End*/ 
+
 
 /*Pa2.1 cmp imm8 to r/m8 Begin*/
 make_EHelper(cmp) {
   //执行减法运算，但不保存结果，实现和sub指令类似，只是不保存结果
   rtl_sub(&t2, &id_dest->val, &id_src->val);
-//只更新标志位，用于后续的条件跳转
-  // 更新标志位
-  rtl_update_ZFSF(&t2, id_dest->width);
 
   // 设置CF标志位
   rtl_sltu(&t0, &id_dest->val, &t2);
   rtl_set_CF(&t0);
+  //只更新标志位，用于后续的条件跳转
+
+  // 更新标志位
+  rtl_update_ZFSF(&t2, id_dest->width);
 
   // 设置OF标志位
   rtl_xor(&t0, &id_dest->val, &id_src->val);
@@ -91,14 +99,21 @@ make_EHelper(adc) {
 }
 
 make_EHelper(sbb) {
+  // 相减
   rtl_sub(&t2, &id_dest->val, &id_src->val);
+  // 如果 id_dest->val < t2，则 t3 = 1，表示发生了借位（无符号比较）。
   rtl_sltu(&t3, &id_dest->val, &t2);
+  //获取当前 CF 标志的值并保存到 t1 中。
+  //如果 CF = 1，则表示上一个运算存在借位，当前结果 t2 再减去这个 CF 值。
   rtl_get_CF(&t1);
   rtl_sub(&t2, &t2, &t1);
+  //结果写回
   operand_write(id_dest, &t2);
 
   rtl_update_ZFSF(&t2, id_dest->width);
 
+  //这里存疑？operand_write 函数会将 t2 的值写回到 id_dest 中，更新 id_dest->val 为 t2
+  //这里应该恒为0？
   rtl_sltu(&t0, &id_dest->val, &t2);
   rtl_or(&t0, &t3, &t0);
   rtl_set_CF(&t0);
