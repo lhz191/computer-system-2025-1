@@ -28,7 +28,7 @@ make_EHelper(call) {
   // the target address is calculated at the decode stage
   // 保存下一条指令的地址到栈中
   rtl_push(&decoding.seq_eip);
-  
+  cpu.eip=decoding.jmp_eip;
   // 设置跳转标志和目标地址
   decoding.is_jmp = 1;
   // 注意：decoding.jmp_eip已经在译码阶段设置好了，不需要我们计算
