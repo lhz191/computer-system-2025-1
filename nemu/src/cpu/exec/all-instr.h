@@ -39,6 +39,7 @@ make_EHelper(jmp_rm);  // 添加jmp_rm声明
 make_EHelper(call_rm); // 添加call_rm声明
 
 make_EHelper(leave);  // 添加leave指令声明
+make_EHelper(nop);  // 添加nop指令声明
 /*Pa2.1 end*/
 
 
