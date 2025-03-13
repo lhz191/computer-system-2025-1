@@ -61,7 +61,8 @@ make_EHelper(call_rm) {
   print_asm("call *%s", id_dest->str);
 }
 
-make_EHelper(nop) {
-  // nop指令不做任何操作
-  print_asm("nop");
-}
+/*Pa2.1 在special.c文件中已被定义*/
+// make_EHelper(nop) {
+//   // nop指令不做任何操作
+//   print_asm("nop");
+// }
