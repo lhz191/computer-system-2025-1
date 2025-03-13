@@ -1,7 +1,26 @@
 #include "cpu/exec.h"
 
 make_EHelper(add) {
-  TODO();
+  // 1. 执行加法：t2 = dest + src
+  rtl_add(&t2, &id_dest->val, &id_src->val);
+
+  // 2. 检查加法是否产生进位
+  rtl_sltu(&t0, &t2, &id_dest->val);
+  rtl_set_CF(&t0);
+
+  // 3. 将结果写回目标操作数
+  operand_write(id_dest, &t2);
+
+  // 4. 更新ZF和SF标志位
+  rtl_update_ZFSF(&t2, id_dest->width);
+
+  // 5. 更新OF标志位（检查是否发生溢出）
+  rtl_xor(&t0, &id_dest->val, &id_src->val);  // t0 = dest ^ src
+  rtl_not(&t0);                               // 取反
+  rtl_xor(&t1, &id_dest->val, &t2);           // t1 = dest ^ result
+  rtl_and(&t0, &t0, &t1);                     // t0 = (~(dest ^ src)) & (dest ^ result)
+  rtl_msb(&t0, &t0, id_dest->width);          // 取最高位
+  rtl_set_OF(&t0);
 
   print_asm_template2(add);
 }
@@ -56,38 +75,87 @@ make_EHelper(cmp) {
 /*Pa2.1 cmp imm8 to r/m8 End*/
 
 
-
+/*Pa2.1 inc Begin*/
 make_EHelper(inc) {
-  TODO();
+  // 1. 增加操作数的值
+  rtl_addi(&t2, &id_dest->val, 1);
+  operand_write(id_dest, &t2);
+
+  // 2. 更新ZF和SF标志位
+  rtl_update_ZFSF(&t2, id_dest->width);
+
+  // 3. 更新OF标志位
+  rtl_xor(&t0, &id_dest->val, &t2);  // 检查符号位变化
+  rtl_and(&t0, &t0, &t2);            // 仅当符号位变化时，OF才会被设置
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
 
   print_asm_template1(inc);
 }
+/*Pa2.1 inc End*/
 
+/*Pa2.1 dec Begin*/
 make_EHelper(dec) {
-  TODO();
+  // 1. 减少操作数的值
+  rtl_subi(&t2, &id_dest->val, 1);
+  operand_write(id_dest, &t2);
+
+  // 2. 更新ZF和SF标志位
+  rtl_update_ZFSF(&t2, id_dest->width);
+
+  // 3. 更新OF标志位
+  rtl_xor(&t0, &id_dest->val, &t2);  // 检查符号位变化
+  rtl_and(&t0, &t0, &id_dest->val);  // 仅当符号位变化时，OF才会被设置
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
 
   print_asm_template1(dec);
 }
+/*Pa2.1 dec End*/
 
+/*Pa2.1 neg Begin*/
 make_EHelper(neg) {
-  TODO();
+  // 1. 计算负值：t2 = 0 - dest
+  rtl_li(&t0, 0);
+  rtl_sub(&t2, &t0, &id_dest->val);
+  operand_write(id_dest, &t2);
+
+  // 2. 更新CF标志位
+  // 如果操作数不为0，则CF应设置为1
+  rtl_neq0(&t0, &id_dest->val);
+  rtl_set_CF(&t0);
+
+  // 3. 更新ZF和SF标志位
+  rtl_update_ZFSF(&t2, id_dest->width);
+
+  // 4. 更新OF标志位
+  rtl_xor(&t0, &id_dest->val, &t2);  // 检查符号位变化
+  rtl_msb(&t0, &t0, id_dest->width);
+  rtl_set_OF(&t0);
 
   print_asm_template1(neg);
 }
+/*Pa2.1 neg End*/
+
 
 make_EHelper(adc) {
+  // 1. 执行加法：t2 = dest + src
   rtl_add(&t2, &id_dest->val, &id_src->val);
+  // 2. 检查第一次加法是否产生进位
   rtl_sltu(&t3, &t2, &id_dest->val);
+  // 3. 获取之前的CF标志位
   rtl_get_CF(&t1);
   rtl_add(&t2, &t2, &t1);
+  //查看这个函数的实现，发现t2会根据id_dest的位数进行填充
   operand_write(id_dest, &t2);
 
   rtl_update_ZFSF(&t2, id_dest->width);
-
+  //更新CF标志位
+  //因此这里t2和id_dest->val的值应该是不同的，如果产生了进位，t2位数会更多
   rtl_sltu(&t0, &t2, &id_dest->val);
   rtl_or(&t0, &t3, &t0);
   rtl_set_CF(&t0);
-
+  //更新OF标志位（检查是否发生溢出）
   rtl_xor(&t0, &id_dest->val, &id_src->val);
   rtl_not(&t0);
   rtl_xor(&t1, &id_dest->val, &t2);
@@ -114,6 +182,9 @@ make_EHelper(sbb) {
 
   //这里存疑？operand_write 函数会将 t2 的值写回到 id_dest 中，更新 id_dest->val 为 t2
   //这里应该恒为0？
+  //疑问解决：
+  //operand_write 函数会将 t2 的值写回到 id_dest 中，更新 id_dest->val 为 t2
+  //因此这里t2和id_dest->val的值应该是不同的，如果产生了借位，t2位数会更多
   rtl_sltu(&t0, &id_dest->val, &t2);
   rtl_or(&t0, &t3, &t0);
   rtl_set_CF(&t0);
@@ -267,3 +338,4 @@ make_EHelper(idiv) {
 
   print_asm_template1(idiv);
 }
+
