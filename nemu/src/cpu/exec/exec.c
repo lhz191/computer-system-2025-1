@@ -65,21 +65,31 @@ make_group(gp4,
     EMPTY, EMPTY, EMPTY, EMPTY,
     EMPTY, EMPTY, EMPTY, EMPTY)
 
+/*
+IDEX用于那些需要从指令中提取操作数信息的指令
+EX用于那些不需要额外解码就能执行的指令
+*/
+
+
+
 /*Pa2.1 Begin*/
 /* 0xff */
 /*0xff操作码使用了分组（group）的概念，
 具体执行哪个指令由ModR/M字节的reg字段（3位）决定。*/
 /*gp5组的8个位置对应reg字段的8种可能值（000~111）*/
+/*当CPU遇到0xff操作码时，首先会执行一个初始解码步骤，通常使用IDEX(E, gp5)，这一步会解析ModR/M字节。
+在这个初始解码之后，CPU会根据ModR/M字节中的reg字段（3位）确定要执行gp5组中的哪一条指令。
+对于gp5组中的各个指令，操作数信息已经在初始解码阶段由E解码器提取出来了，所以在组内的实现应该使用EX*/
 make_group(gp5,
-    EMPTY,       /* 000 */
-    EMPTY,       /* 001 */
-    EMPTY,       /* 010 */
-    EMPTY,       /* 011 */
-    EMPTY,       /* 100 */
-    EMPTY,       /* 101 */
-    EX(push),    /* 110: push指令，对应reg=6 */
-    EMPTY        /* 111 */
-)   
+    EX(inc),        /* 000: inc指令 */
+    EX(dec),        /* 001: dec指令 */
+    EX(call_rm),    /* 010: call rm指令 */
+    EX(call),       /* 011: call指令 */
+    EX(jmp_rm),     /* 100: jmp rm指令 */
+    EX(jmp),        /* 101: jmp指令 */
+    EX(push),       /* 110: push指令 */
+    EMPTY           /* 111: 未使用 */
+)
 /*Pa2.1 End*/
 
   /* 0x0f 0x01*/
