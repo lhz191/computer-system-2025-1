@@ -32,7 +32,7 @@ make_EHelper(cmp);  // 添加cmp指令声明
 make_EHelper(inc);  // 添加inc指令声明
 make_EHelper(dec);  // 添加dec指令声明
 make_EHelper(neg);  // 添加neg指令声明
-
+make_EHelper(ret);  // 添加ret指令声明
 /*Pa2.1 end*/
 
 
