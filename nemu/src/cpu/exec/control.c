@@ -38,7 +38,12 @@ make_EHelper(call) {
 }
 
 make_EHelper(ret) {
-  TODO();
+  // 从栈中弹出返回地址
+  rtl_pop(&t0);
+  
+  // 设置下一条指令的地址
+  decoding.jmp_eip = t0;
+  decoding.is_jmp = 1;
 
   print_asm("ret");
 }
