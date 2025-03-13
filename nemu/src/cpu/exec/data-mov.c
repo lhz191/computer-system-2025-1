@@ -35,7 +35,12 @@ make_EHelper(popa) {
 }
 
 make_EHelper(leave) {
-  TODO();
+  // leave指令相当于：
+  // mov esp, ebp
+  rtl_mv(&cpu.esp, &cpu.ebp);
+  
+  // pop ebp
+  rtl_pop(&cpu.ebp);
 
   print_asm("leave");
 }
