@@ -123,16 +123,18 @@ make_rtl_setget_eflags(CF)
 make_rtl_setget_eflags(OF)
 make_rtl_setget_eflags(ZF)
 make_rtl_setget_eflags(SF)
+/*Pa2.1 Begin*/
 
 static inline void rtl_mv(rtlreg_t* dest, const rtlreg_t *src1) {
   // dest <- src1
-  TODO();
+  *dest = *src1;
 }
 
-static inline void rtl_not(rtlreg_t* dest) {
-  // dest <- ~dest
-  TODO();
+static inline void rtl_not(rtlreg_t *dest, const rtlreg_t* src1) {
+  // dest <- ~src1
+  *dest = ~(*src1);
 }
+/*Pa2.1 End*/
 
 /*对于8位到32位的符号扩展：最高位是1则扩展后高位全为1，否则则高位全为0
 如果8位数是0x7f(01111111)，扩展后是0x0000007f
