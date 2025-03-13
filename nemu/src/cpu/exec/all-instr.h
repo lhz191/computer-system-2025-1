@@ -35,6 +35,9 @@ make_EHelper(neg);  // 添加neg指令声明
 make_EHelper(ret);  // 添加ret指令声明
 make_EHelper(jmp);  // 添加jmp指令声明
 
+make_EHelper(jmp_rm);  // 添加jmp_rm声明
+make_EHelper(call_rm); // 添加call_rm声明
+
 /*Pa2.1 end*/
 
 
