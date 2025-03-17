@@ -322,6 +322,8 @@ make_DHelper(SI) {
   //DopHelper是操作数解码器（Decode OPerand Helper）
   //DHelper是指令解码器（Decode Helper）
   decode_op_SI(eip, id_dest, true);
+  printf("指令大小: %d字节\n", id_dest->width);
+  printf("指令原始偏移量: 0x%x\n", id_dest->imm);
 }
 
 
