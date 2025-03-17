@@ -58,8 +58,6 @@ static inline make_DopHelper(SI) {
   rtl_li(&op->val, op->simm);
   printf("指令大小: %d字节\n", op->width);
   printf("指令原始偏移量: 0x%x\n", imm);
-  printf("指令原始simm: 0x%x\n", op->simm);
-
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->simm);
 #endif
@@ -280,8 +278,15 @@ make_DHelper(a2O) {
 
 make_DHelper(J) {
   decode_op_SI(eip, id_dest, false);
+  
+  // 添加调试信息
+  printf("J解码器 - 当前eip: 0x%x\n", *eip);
+  printf("J解码器 - 偏移量: 0x%x (%d)\n", id_dest->simm, id_dest->simm);
+  
   // the target address can be computed in the decode stage
   decoding.jmp_eip = id_dest->simm + *eip;
+  
+  printf("J解码器 - 计算出的跳转目标: 0x%x\n", decoding.jmp_eip);
 }
 
 make_DHelper(push_SI) {
