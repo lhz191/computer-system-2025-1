@@ -9,7 +9,7 @@ make_EHelper(nemu_trap);
 
 
 
-/*Pa2.1 begin*/
+/*Pa2.1 Pa2.2 begin*/
 // 添加sub指令的声明
 // Group 1 instructions
 make_EHelper(add);
@@ -44,7 +44,9 @@ make_EHelper(nop);  // 添加nop指令声明
 make_EHelper(setcc);  // 添加setcc指令声明
 
 make_EHelper(movzx);  // 添加movzx指令声明
-/*Pa2.1 end*/
+
+make_EHelper(adc);  // 添加adc指令声明
+/*Pa2.1 Pa2.2 end*/
 
 
 
