@@ -117,7 +117,8 @@ opcode_entry opcode_table [512] = {
   //Pa2.1 0x31: xor r32 to r/m32
   /* 0x30 */	EMPTY, IDEX(G2E, xor), EMPTY, EMPTY, 
   /* 0x34 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0x38 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /*Pa2.1 0x3b: cmp r/m32 to r32*/
+  /* 0x38 */	EMPTY, EMPTY, EMPTY, IDEX(G2E, cmp),
   /*Pa2.1 0x3c cmp imm8 to r/m8*/
   /* 0x3c */	IDEXW(I2a, cmp, 1), IDEX(I2a, cmp), EMPTY, EMPTY,
   /* 0x40 */	IDEX(r, inc), IDEX(r, inc), IDEX(r, inc), IDEX(r, inc),
