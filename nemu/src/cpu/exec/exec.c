@@ -134,8 +134,9 @@ opcode_entry opcode_table [512] = {
   /* 0x40 */	IDEX(r, inc), IDEX(r, inc), IDEX(r, inc), IDEX(r, inc),
   /*Pa2.1 0x46: inc %esi*/
   /* 0x44 */	IDEX(r, inc), IDEX(r, inc), IDEX(r, inc), IDEX(r, inc),
-  /* 0x48 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0x4c */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /*Pa2.2 0x48-0x4f: DEC r32指令组 - 将32位寄存器的值减1
+  /* 0x48 */	IDEX(r, dec), IDEX(r, dec), IDEX(r, dec), IDEX(r, dec),
+  /* 0x4c */	IDEX(r, dec), IDEX(r, dec), IDEX(r, dec), IDEX(r, dec),
   /*Pa2.1
   通过查看x86指令集手册得知的。在x86架构中：
   0x50-0x57这个范围的操作码专门用于push寄存器指令：
