@@ -53,7 +53,7 @@ make_EHelper(call_rm) {
   rtl_push(&decoding.seq_eip);
   
   // 2. 设置跳转目标地址（从操作数中获取）
-  decoding.jmp_eip = id_dest->val;
+  decoding.jmp_eip = decoding.seq_eip + id_dest->val;
   
   // 3. 设置跳转标志
   decoding.is_jmp = 1;
