@@ -278,7 +278,7 @@ make_DHelper(J) {
   decoding.jmp_eip = id_dest->simm + *eip;
   printf("指令大小: %d字节\n", id_dest->width);
   printf("指令原始偏移量: 0x%x\n", id_dest->imm);
-  printf("指令偏移量: 0x%x\n", id_dest->val);
+  printf("指令偏移量: %s\n", id_dest->str);
 }
 
 make_DHelper(push_SI) {
