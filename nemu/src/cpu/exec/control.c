@@ -24,24 +24,11 @@ make_EHelper(jmp_rm) {
 }
 
 make_EHelper(call) {
-  // 1. 保存下一条指令的地址到栈中
+  // the target address is calculated at the decode stage.
   rtl_push(&decoding.seq_eip);
-  
-  // 2. 计算跳转目标地址
-  decoding.jmp_eip = decoding.seq_eip + id_dest->imm;
-  
-  // 3. 设置跳转标志位
+  //rtl_push(&cpu.eip);
+  cpu.eip=decoding.jmp_eip;
   decoding.is_jmp = 1;
-  
-  // 调试信息
-  printf("当前eip: 0x%x\n", cpu.eip);
-  printf("下一条指令地址: 0x%x\n", decoding.seq_eip);
-  printf("偏移量: 0x%x\n", id_dest->imm); 
-  printf("跳转目标: 0x%x\n", decoding.jmp_eip);
-  
-  // 不要直接设置cpu.eip
-  // cpu.eip = decoding.jmp_eip; <- 删除这行
-
   print_asm("call %x", decoding.jmp_eip);
 }
 make_EHelper(ret) {
