@@ -57,8 +57,15 @@ make_group(gp2,
 
   /* 0xf6, 0xf7 */
 make_group(gp3,
-    EMPTY, EMPTY, EMPTY, EMPTY,
-    EMPTY, EMPTY, EMPTY, EMPTY)
+    IDEX(test_I, test),  // 000: TEST r/m, imm - 需要立即数，所以用IDEX
+    EMPTY,               // 001: 未使用
+    EX(not),            // 010: NOT r/m - 不需要额外操作数，用EX
+    EX(neg),            // 011: NEG r/m - 不需要额外操作数，用EX
+    EX(mul),            // 100: MUL r/m - 无符号乘法
+    EX(imul1),          // 101: IMUL r/m - 有符号乘法
+    EX(div),            // 110: DIV r/m - 无符号除法
+    EX(idiv)            // 111: IDIV r/m - 有符号除法
+)
 
   /* 0xfe */
 make_group(gp4,

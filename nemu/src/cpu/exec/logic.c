@@ -160,9 +160,14 @@ make_EHelper(setcc) {
   print_asm("set%s %s", get_cc_name(subcode), id_dest->str);
 }
 
-make_EHelper(not) 
-{
-  TODO();
-
+make_EHelper(not) {
+  // 1. 执行按位取反操作
+  rtl_not(&t0, &id_dest->val);
+  
+  // 2. 将结果写回目标操作数
+  operand_write(id_dest, &t0);
+  
+  // NOT 指令不影响任何标志位
+  
   print_asm_template1(not);
 }
