@@ -44,12 +44,12 @@ static inline make_DopHelper(SI) {
   //simm表示signed immediate，有符号立即数
   uint32_t imm = instr_fetch(eip, op->width);
     printf("指令原始偏移量: 0x%x\n", imm);
-  // if (op->width == 1) {
-  //   // 对8位立即数进行符号扩展
-  //   op->simm = (int8_t)imm;
-  // } else {
-  //   op->simm = (int32_t)imm;
-  // }
+  if (op->width == 1) {
+    // 对8位立即数进行符号扩展
+    op->simm = (int8_t)imm;
+  } else {
+    op->simm = (int32_t)imm;
+  }
   rtl_sext(&imm, &imm, op->width);
   printf("指令原始偏移量: 0x%x\n", imm);
 
