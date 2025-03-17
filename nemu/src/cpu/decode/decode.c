@@ -43,6 +43,7 @@ static inline make_DopHelper(SI) {
   //将读取的数据作为有符号立即数存储在op->simm中
   //simm表示signed immediate，有符号立即数
   uint32_t imm = instr_fetch(eip, op->width);
+    printf("指令原始偏移量: 0x%x\n", imm);
   // if (op->width == 1) {
   //   // 对8位立即数进行符号扩展
   //   op->simm = (int8_t)imm;
