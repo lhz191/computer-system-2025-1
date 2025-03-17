@@ -36,7 +36,7 @@ make_EHelper(call) {
   // 调试信息
   printf("当前eip: 0x%x\n", cpu.eip);
   printf("下一条指令地址: 0x%x\n", decoding.seq_eip);
-  printf("偏移量: 0x%x\n", id_dest->addr); 
+  printf("偏移量: 0x%x\n", id_dest->val); 
   printf("跳转目标: 0x%x\n", decoding.jmp_eip);
   
   // 不要直接设置cpu.eip
