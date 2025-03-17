@@ -147,11 +147,47 @@ void difftest_step(uint32_t eip) {
   gdb_si();
   gdb_getregs(&r);
 
+
   // TODO: Check the registers state with QEMU.
   // Set `diff` as `true` if they are not the same.
-  TODO();
+  // TODO();
 
+  // 检查寄存器状态
+  if (r.eax != cpu.eax) { diff = true; }
+  if (r.ecx != cpu.ecx) { diff = true; }
+  if (r.edx != cpu.edx) { diff = true; }
+  if (r.ebx != cpu.ebx) { diff = true; }
+  if (r.esp != cpu.esp) { diff = true; }
+  if (r.ebp != cpu.ebp) { diff = true; }
+  if (r.esi != cpu.esi) { diff = true; }
+  if (r.edi != cpu.edi) { diff = true; }
+  if (r.eip != cpu.eip) { diff = true; }
+
+  // 如果发现不匹配，打印详细信息
   if (diff) {
+    printf("=== Execution diverged ===\n");
+    printf("QEMU:\n");
+    printf("eax = 0x%08x\n", r.eax);
+    printf("ecx = 0x%08x\n", r.ecx);
+    printf("edx = 0x%08x\n", r.edx);
+    printf("ebx = 0x%08x\n", r.ebx);
+    printf("esp = 0x%08x\n", r.esp);
+    printf("ebp = 0x%08x\n", r.ebp);
+    printf("esi = 0x%08x\n", r.esi);
+    printf("edi = 0x%08x\n", r.edi);
+    printf("eip = 0x%08x\n", r.eip);
+    
+    printf("\nNEMU:\n");
+    printf("eax = 0x%08x\n", cpu.eax);
+    printf("ecx = 0x%08x\n", cpu.ecx);
+    printf("edx = 0x%08x\n", cpu.edx);
+    printf("ebx = 0x%08x\n", cpu.ebx);
+    printf("esp = 0x%08x\n", cpu.esp);
+    printf("ebp = 0x%08x\n", cpu.ebp);
+    printf("esi = 0x%08x\n", cpu.esi);
+    printf("edi = 0x%08x\n", cpu.edi);
+    printf("eip = 0x%08x\n", cpu.eip);
+    
     nemu_state = NEMU_END;
   }
 }
