@@ -46,6 +46,11 @@ make_EHelper(setcc);  // 添加setcc指令声明
 make_EHelper(movzx);  // 添加movzx指令声明
 
 make_EHelper(adc);  // 添加adc指令声明
+
+make_EHelper(rol);  // 循环左移
+make_EHelper(shl);  // 逻辑左移
+make_EHelper(shr);  // 逻辑右移
+make_EHelper(sar);  // 算术右移
 /*Pa2.1 Pa2.2 end*/
 
 

@@ -78,23 +78,51 @@ make_EHelper(or) {
 }
 
 make_EHelper(sar) {
-  TODO();
-  // unnecessary to update CF and OF in NEMU
-
+  // 1. 先对目标操作数进行符号扩展
+  rtl_sext(&t0, &id_dest->val, id_dest->width);
+  
+  // 2. 执行算术右移操作
+  // rtl_sar(dest, src1, src2) 其中src2是移位数量
+  rtl_sar(&t0, &t0, &id_src->val);
+  
+  // 3. 将结果写回目标操作数
+  operand_write(id_dest, &t0);
+  
+  // 4. 更新标志位
+  rtl_update_ZFSF(&id_dest->val, id_dest->width);
+  
+  // CF和OF在NEMU中不需要更新，注释已说明
+  
   print_asm_template2(sar);
 }
 
 make_EHelper(shl) {
-  TODO();
-  // unnecessary to update CF and OF in NEMU
-
+  // 1. 获取目标操作数
+  rtl_shl(&t0, &id_dest->val, &id_src->val);
+  
+  // 2. 将结果写回目标操作数
+  operand_write(id_dest, &t0);
+  
+  // 3. 更新标志位
+  rtl_update_ZFSF(&id_dest->val, id_dest->width);
+  
+  // CF和OF在NEMU中不需要更新，注释已说明
+  
   print_asm_template2(shl);
 }
 
 make_EHelper(shr) {
-  TODO();
-  // unnecessary to update CF and OF in NEMU
-
+  // 1. 执行逻辑右移操作
+  rtl_shr(&t0, &id_dest->val, &id_src->val);
+  
+  // 2. 将结果写回目标操作数
+  operand_write(id_dest, &t0);
+  
+  // 3. 更新标志位
+  rtl_update_ZFSF(&id_dest->val, id_dest->width);
+  
+  // CF和OF在NEMU中不需要更新，注释已说明
+  
   print_asm_template2(shr);
 }
 
