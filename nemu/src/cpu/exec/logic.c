@@ -111,6 +111,32 @@ make_EHelper(shl) {
   print_asm_template2(shl);
 }
 
+
+make_EHelper(rol) {
+  // 1. 获取移位数量（对32取模，因为我们只关心低5位）
+  rtl_andi(&t0, &id_src->val, 0x1f);
+  
+  if (t0 != 0) {  // 只有当移位数不为0时才进行操作
+    // 2. 执行循环左移操作
+    rtl_shl(&t2, &id_dest->val, &t0);  // 左移部分
+    rtl_li(&t3, 32);
+    rtl_sub(&t3, &t3, &t0);  // 32 - count
+    rtl_shr(&t3, &id_dest->val, &t3);  // 右移部分（循环回来的位）
+    rtl_or(&t0, &t2, &t3);  // 合并结果
+    
+    // 3. 将结果写回目标操作数
+    operand_write(id_dest, &t0);
+    
+    // 4. 更新标志位
+    rtl_update_ZFSF(&t0, id_dest->width);
+  }
+  
+  // CF和OF在NEMU中不需要更新，注释已说明
+  
+  print_asm_template2(rol);
+}
+
+
 make_EHelper(shr) {
   // 1. 执行逻辑右移操作
   rtl_shr(&t0, &id_dest->val, &id_src->val);
