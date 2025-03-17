@@ -51,8 +51,7 @@ static inline make_DopHelper(SI) {
   //   op->simm = (int32_t)imm;
   // }
   rtl_sext(&imm, &imm, op->width);
-  printf("指令原始偏移量: 0x%x\n", imm);
-
+  
   op->simm = (int32_t)imm;
   // 根据操作数宽度进行符号扩展，使用RTL指令将立即数加载到操作数的val字段中
   rtl_li(&op->val, op->simm);
