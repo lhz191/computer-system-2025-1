@@ -166,11 +166,11 @@ opcode_entry opcode_table [512] = {
   // 0x6a: push imm8 with sign extension
   /* 0x68 */	IDEX(I, push), EMPTY, IDEXW(SI, push, 1), EMPTY, 
   /* 0x6c */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0x70 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /*Pa2.1 0x74，0x75 jcc指令*/
-  /* 0x74 */	IDEXW(J, jcc, 1), IDEXW(J, jcc, 1), EMPTY, EMPTY,
-  /* 0x78 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0x7c */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /*Pa2.2 0x70-7f: 条件跳转指令组 */
+  /* 0x70 */	IDEXW(J, jcc, 1), IDEXW(J, jcc, 1), IDEXW(J, jcc, 1), IDEXW(J, jcc, 1),
+  /* 0x74 */	IDEXW(J, jcc, 1), IDEXW(J, jcc, 1), IDEXW(J, jcc, 1), IDEXW(J, jcc, 1),
+  /* 0x78 */	IDEXW(J, jcc, 1), IDEXW(J, jcc, 1), IDEXW(J, jcc, 1), IDEXW(J, jcc, 1),
+  /* 0x7c */	IDEXW(J, jcc, 1), IDEXW(J, jcc, 1), IDEXW(J, jcc, 1), IDEXW(J, jcc, 1),
   /* 0x80 */	IDEXW(I2E, gp1, 1), IDEX(I2E, gp1), EMPTY, IDEX(SI2E, gp1),
   /*Pa2.1 0x84 c0 test %al,%al*/
   /* 0x84 */	IDEXW(G2E, test, 1), IDEX(G2E, test), EMPTY, EMPTY,
