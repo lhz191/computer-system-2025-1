@@ -164,7 +164,7 @@ void difftest_step(uint32_t eip) {
   if (r.eip != cpu.eip) { diff = true; }
 
   // 如果发现不匹配，打印详细信息
-  if (diff || 1) {
+  if (diff || !diff) {
     printf("=== Execution diverged ===\n");
     printf("QEMU:\n");
     printf("eax = 0x%08x\n", r.eax);
@@ -188,6 +188,6 @@ void difftest_step(uint32_t eip) {
     printf("edi = 0x%08x\n", cpu.edi);
     printf("eip = 0x%08x\n", cpu.eip);
     
-    nemu_state = NEMU_END;
+    // nemu_state = NEMU_END;
   }
 }
