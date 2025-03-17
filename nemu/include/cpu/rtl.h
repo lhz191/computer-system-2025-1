@@ -143,14 +143,17 @@ static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
   // 根据源操作数的宽度进行符号扩展
   
-  // 首先获取源操作数的有效位
-  *dest = *src1 & ((1u << (width * 8)) - 1);
+  // // 首先获取源操作数的有效位
+  // *dest = *src1 & ((1u << (width * 8)) - 1);
   
-  // 如果最高位是1，需要进行符号扩展
-  if (*dest & (1u << (width * 8 - 1))) {
-    // 将高位全部置为1
-    *dest |= (~0u) << (width * 8);
-  }
+  // // 如果最高位是1，需要进行符号扩展
+  // if (*dest & (1u << (width * 8 - 1))) {
+  //   // 将高位全部置为1
+  //   *dest |= (~0u) << (width * 8);
+  // }
+  rtl_li(&t1,32-width*8);
+  rtl_shl(dest,src1,&t1);
+  rtl_sar(dest,dest,&t1);
 }
 
 static inline void rtl_push(const rtlreg_t* src1) {
