@@ -276,6 +276,8 @@ make_DHelper(J) {
   decode_op_SI(eip, id_dest, false);
   // the target address can be computed in the decode stage
   decoding.jmp_eip = id_dest->simm + *eip;
+  printf("指令大小: %d字节\n", id_dest->width);
+  printf("指令原始偏移量: 0x%x\n", id_dest->imm);
 }
 
 make_DHelper(push_SI) {
@@ -322,8 +324,8 @@ make_DHelper(SI) {
   //DopHelper是操作数解码器（Decode OPerand Helper）
   //DHelper是指令解码器（Decode Helper）
   decode_op_SI(eip, id_dest, true);
-  printf("指令大小: %d字节\n", id_dest->width);
-  printf("指令原始偏移量: 0x%x\n", id_dest->imm);
+  // printf("指令大小: %d字节\n", id_dest->width);
+  // printf("指令原始偏移量: 0x%x\n", id_dest->imm);
 }
 
 
