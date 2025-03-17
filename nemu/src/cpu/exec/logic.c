@@ -62,7 +62,17 @@ make_EHelper(xor) {
 }
 
 make_EHelper(or) {
-  TODO();
+  // 执行或运算
+  rtl_or(&t2, &id_dest->val, &id_src->val);
+  operand_write(id_dest, &t2);
+
+  // 更新标志位
+  rtl_update_ZFSF(&t2, id_dest->width);
+  
+  // OR指令会清除OF和CF标志位
+  rtl_li(&t0, 0);
+  rtl_set_CF(&t0);
+  rtl_set_OF(&t0);
 
   print_asm_template2(or);
 }
@@ -96,7 +106,8 @@ make_EHelper(setcc) {
   print_asm("set%s %s", get_cc_name(subcode), id_dest->str);
 }
 
-make_EHelper(not) {
+make_EHelper(not) 
+{
   TODO();
 
   print_asm_template1(not);

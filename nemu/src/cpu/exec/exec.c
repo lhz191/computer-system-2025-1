@@ -103,7 +103,8 @@ opcode_entry opcode_table [512] = {
   /*Pa2.1 0x00 add指令*/
   /* 0x00 */	IDEXW(G2E, add, 1), EMPTY, EMPTY, IDEX(E2G, add),
   /* 0x04 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0x08 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /*Pa2.2 0x09 or指令*/
+  /* 0x08 */	EMPTY, IDEX(G2E, or), EMPTY, EMPTY,
   /*Pa2.2 0x0f 0xbe：两字节操作码的转义，去两字节操作码表查找 */
   /* 0x0c */	EMPTY, EMPTY, EMPTY, EX(2byte_esc),
   /*Pa2.2 0x13 adc指令*/
