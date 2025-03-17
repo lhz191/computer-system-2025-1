@@ -25,11 +25,19 @@ make_EHelper(jmp_rm) {
 
 make_EHelper(call) {
   /*Pa2.1 Begin*/
-  // the target address is calculated at the decode stage
-  // 保存下一条指令的地址到栈中
+    // 1. 计算返回地址（当前指令的下一条指令地址）
+  decoding.seq_eip = cpu.eip + id_dest->width + 1;
+  // 2. 保存返回地址到栈中
   rtl_push(&decoding.seq_eip);
-  cpu.eip=decoding.jmp_eip;
-  // 设置跳转标志和目标地址
+  // 3. 计算跳转目标地址
+  // 注意：id_dest->val已经是解码后的目标地址
+  decoding.jmp_eip = decoding.seq_eip + id_dest->val;
+  
+  // // the target address is calculated at the decode stage
+  // // 保存下一条指令的地址到栈中
+  // rtl_push(&decoding.seq_eip);
+  // cpu.eip=decoding.jmp_eip;
+  // // 设置跳转标志和目标地址
   decoding.is_jmp = 1;
   // 注意：decoding.jmp_eip已经在译码阶段设置好了，不需要我们计算
 
