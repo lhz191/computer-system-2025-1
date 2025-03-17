@@ -134,7 +134,7 @@ opcode_entry opcode_table [512] = {
   /* 0x40 */	IDEX(r, inc), IDEX(r, inc), IDEX(r, inc), IDEX(r, inc),
   /*Pa2.1 0x46: inc %esi*/
   /* 0x44 */	IDEX(r, inc), IDEX(r, inc), IDEX(r, inc), IDEX(r, inc),
-  /*Pa2.2 0x48-0x4f: DEC r32指令组 - 将32位寄存器的值减1
+  /*Pa2.2 0x48-0x4f: DEC r32指令组 - 将32位寄存器的值减1*/
   /* 0x48 */	IDEX(r, dec), IDEX(r, dec), IDEX(r, dec), IDEX(r, dec),
   /* 0x4c */	IDEX(r, dec), IDEX(r, dec), IDEX(r, dec), IDEX(r, dec),
   /*Pa2.1
