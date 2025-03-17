@@ -42,6 +42,8 @@ make_EHelper(leave);  // 添加leave指令声明
 make_EHelper(nop);  // 添加nop指令声明
 
 make_EHelper(setcc);  // 添加setcc指令声明
+
+make_EHelper(movzx);  // 添加movzx指令声明
 /*Pa2.1 end*/
 
 
