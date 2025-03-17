@@ -161,10 +161,13 @@ make_EHelper(setcc) {
 }
 
 make_EHelper(not) {
-  // 1. 执行按位取反操作
-  rtl_not(&t0, &id_dest->val);
+  // 1. 先将源操作数复制到临时寄存器
+  rtl_mv(&t0, &id_dest->val);
   
-  // 2. 将结果写回目标操作数
+  // 2. 执行按位取反操作
+  rtl_not(&t0);
+  
+  // 3. 将结果写回目标操作数
   operand_write(id_dest, &t0);
   
   // NOT 指令不影响任何标志位

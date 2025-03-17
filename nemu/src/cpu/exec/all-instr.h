@@ -51,7 +51,19 @@ make_EHelper(rol);  // 循环左移
 make_EHelper(shl);  // 逻辑左移
 make_EHelper(shr);  // 逻辑右移
 make_EHelper(sar);  // 算术右移
+
+
+
+
+// gp3 组指令声明
+make_EHelper(not);   // NOT r/m
+make_EHelper(neg);   // NEG r/m
+make_EHelper(mul);   // MUL r/m (无符号乘法)
+make_EHelper(imul1); // IMUL r/m (有符号乘法)
+make_EHelper(div);   // DIV r/m (无符号除法)
+make_EHelper(idiv);  // IDIV r/m (有符号除法)
 /*Pa2.1 Pa2.2 end*/
+
 
 
 
