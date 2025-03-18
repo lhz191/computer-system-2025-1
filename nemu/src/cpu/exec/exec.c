@@ -205,7 +205,7 @@ opcode_entry opcode_table [512] = {
   /* 0xe4 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.1 Begin*/
   /*查阅手册得知，0xe9和0xec都是jmp指令*/
-  /* 0xe8 */	IDEX(J, call), IDEX(J, jmp), EMPTY, IDEX(J, jmp),
+  /* 0xe8 */	IDEX(J, call), IDEX(J, jmp), EMPTY, IDEXW(J, jmp, 1),
   /*Pa2.1 End*/
   /* 0xec */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xf0 */	EMPTY, EMPTY, EMPTY, EMPTY,
