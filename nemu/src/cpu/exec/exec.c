@@ -260,7 +260,8 @@ opcode_entry opcode_table [512] = {
   /* 0xa0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xa4 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xa8 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0xac */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /*Pa2.2 0x0f af：IMUL r32, r/m32 (有符号整数乘法，双操作数形式)*/
+  /* 0xac */	EMPTY, EMPTY, EMPTY, IDEX(E2G, imul2),
   /* 0xb0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.1 0x0f b6: movzx r32, r/m8*/
   /* 0xb4 */	EMPTY, EMPTY, IDEXW(mov_E2G, movzx, 1), EMPTY,
