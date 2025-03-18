@@ -63,6 +63,8 @@ make_EHelper(imul1); // IMUL r/m (有符号乘法)
 make_EHelper(imul2); //
 make_EHelper(div);   // DIV r/m (无符号除法)
 make_EHelper(idiv);  // IDIV r/m (有符号除法)
+
+make_EHelper(cltd);  // CDQ指令的另一个名字是CLTD
 /*Pa2.1 Pa2.2 end*/
 
 
