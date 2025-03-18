@@ -45,26 +45,47 @@ make_EHelper(leave) {
   print_asm("leave");
 }
 
+/*Pa2.2 cltd和cwtl的实现存疑，没有程序进行测试*/
 make_EHelper(cltd) {
   if (decoding.is_operand_size_16) {
-    TODO();
+    // cwd: 将AX符号扩展到DX:AX
+    // 从AX的最高位(bit 15)获取符号位
+    rtl_sari(&t0, &reg_l(R_EAX), 15);
+    // 将AX的符号位复制到DX的所有位
+    rtl_sr(R_DX, 2, &t0);
   }
   else {
-    TODO();
+    // cdq: 将EAX符号扩展到EDX:EAX
+    // 从EAX的最高位(bit 31)获取符号位
+    rtl_sari(&t0, &reg_l(R_EAX), 31);
+    // 将EAX的符号位复制到EDX的所有位
+    rtl_sr(R_EDX, 4, &t0);
   }
 
-  print_asm(decoding.is_operand_size_16 ? "cwtl" : "cltd");
+  print_asm(decoding.is_operand_size_16 ? "cwd" : "cdq");
 }
 
 make_EHelper(cwtl) {
   if (decoding.is_operand_size_16) {
-    TODO();
+    // cbw: 将AL符号扩展到AX
+    // 提取AL(8位)
+    rtl_lr(&t0, R_EAX, 1);
+    // 符号扩展到16位
+    rtl_sext(&t0, &t0, 1);
+    // 写回AX
+    rtl_sr(R_AX, 2, &t0);
   }
   else {
-    TODO();
+    // cwde: 将AX符号扩展到EAX
+    // 提取AX(16位)
+    rtl_lr(&t0, R_EAX, 2);
+    // 符号扩展到32位
+    rtl_sext(&t0, &t0, 2);
+    // 写回EAX
+    rtl_sr(R_EAX, 4, &t0);
   }
 
-  print_asm(decoding.is_operand_size_16 ? "cbtw" : "cwtl");
+  print_asm(decoding.is_operand_size_16 ? "cbw" : "cwde");
 }
 
 make_EHelper(movsx) {
