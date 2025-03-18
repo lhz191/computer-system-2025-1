@@ -108,7 +108,7 @@ make_group(gp7,
 
 opcode_entry opcode_table [512] = {
   /*Pa2.1 0x00 add指令*/
-  /* 0x00 */	IDEXW(G2E, add, 1), EMPTY, EMPTY, IDEX(E2G, add),
+  /* 0x00 */	IDEXW(G2E, add, 1), IDEX(G2E, add), EMPTY, IDEX(E2G, add),
   /* 0x04 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.2 0x09 or指令*/
   /* 0x08 */	IDEXW(G2E, or, 1), IDEX(G2E, or), IDEXW(E2G, or, 1), IDEX(E2G, or),
@@ -265,7 +265,7 @@ opcode_entry opcode_table [512] = {
   /* 0xac */	EMPTY, EMPTY, EMPTY, IDEX(E2G, imul2),
   /* 0xb0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.1 0x0f b6: movzx r32, r/m8*/
-  /* 0xb4 */	EMPTY, EMPTY, IDEXW(mov_E2G, movzx, 1),IDEXW(mov_E2G, movzx, 2),
+  /* 0xb4 */	EMPTY, EMPTY, IDEXW(mov_E2G, movzx, 1), IDEXW(mov_E2G, movzx, 2),
   /* 0xb8 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xbc */	EMPTY, EMPTY, IDEXW(E2G, movsx, 1),  IDEXW(mov_E2G, movsx, 2),
   /* 0xc0 */	EMPTY, EMPTY, EMPTY, EMPTY,
