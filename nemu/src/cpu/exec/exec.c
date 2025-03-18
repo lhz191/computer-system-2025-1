@@ -251,8 +251,9 @@ opcode_entry opcode_table [512] = {
   /* 0x7c */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x80 */	EMPTY, EMPTY, EMPTY, EMPTY,
   //Pa2.1 0x84: je rel32 (jump if equal)
-  /* 0x84 */	IDEX(J, jcc), EMPTY, EMPTY, EMPTY, 
-  /*Pa2.1 0x0f 88: jmp rel8*/
+  /*Pa2.2 0x0f 84-87: jmp rel8*/
+  /* 0x84 */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
+  /*Pa2.2 0x0f 88-8b: jmp rel8*/
   /* 0x88 */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
   /* 0x8c */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x90 */	EMPTY, EMPTY, EMPTY, EMPTY,
