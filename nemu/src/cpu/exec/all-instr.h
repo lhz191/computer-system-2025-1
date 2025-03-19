@@ -67,6 +67,13 @@ make_EHelper(idiv);  // IDIV r/m (有符号除法)
 make_EHelper(cltd);  // CDQ指令的另一个名字是CLTD
 /*Pa2.1 Pa2.2 end*/
 
+/*Pa2.3 Begin*/
+make_EHelper(in);
+make_EHelper(out);
+/*Pa2.3 End*/
+
+
+
 
 
 
