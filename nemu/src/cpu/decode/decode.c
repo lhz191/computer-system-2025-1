@@ -280,13 +280,13 @@ make_DHelper(J) {
   decode_op_SI(eip, id_dest, false);
   
   // 添加调试信息
-  printf("J解码器 - 当前eip: 0x%x\n", *eip);
-  printf("J解码器 - 偏移量: 0x%x (%d)\n", id_dest->simm, id_dest->simm);
+  // printf("J解码器 - 当前eip: 0x%x\n", *eip);
+  // printf("J解码器 - 偏移量: 0x%x (%d)\n", id_dest->simm, id_dest->simm);
   
   // the target address can be computed in the decode stage
   decoding.jmp_eip = id_dest->simm + *eip;
   
-  printf("J解码器 - 计算出的跳转目标: 0x%x\n", decoding.jmp_eip);
+  // printf("J解码器 - 计算出的跳转目标: 0x%x\n", decoding.jmp_eip);
 }
 
 make_DHelper(push_SI) {
