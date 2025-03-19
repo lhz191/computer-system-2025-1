@@ -130,6 +130,8 @@ static int cmd_info(char *args) {
     for (int i = 0; i < 8; i++) {
       printf("%s: 0x%08x\n", regsl[i], reg_l(i));
     }
+    // 打印EFLAGS寄存器状态
+    printf("eflags: 0x%08x\n", cpu.eflags.val);
     // printf("ecx: 0x%08x\n", cpu.ecx);
     // printf("eax: 0x%08x\n", cpu.eax);
     //经测试，直接print cpu.ecx与reg_l的结果相同，证明实现正确
