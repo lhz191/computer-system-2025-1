@@ -70,6 +70,7 @@ make_EHelper(cltd);  // CDQ指令的另一个名字是CLTD
 /*Pa2.3 Begin*/
 make_EHelper(in);
 make_EHelper(out);
+make_EHelper(cwtl);
 /*Pa2.3 End*/
 
 
