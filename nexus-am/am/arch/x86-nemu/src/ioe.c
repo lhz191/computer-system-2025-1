@@ -9,7 +9,8 @@ void _ioe_init() {
 }
 
 unsigned long _uptime() {
-  return 0;
+  unsigned long now = inl(RTC_PORT);
+  return now - boot_time;
 }
 
 uint32_t* const fb = (uint32_t *)0x40000;
@@ -21,16 +22,28 @@ _Screen _screen = {
 
 extern void* memcpy(void *, const void *, int);
 
+// void _draw_rect(const uint32_t *pixels, int x, int y, int w, int h) {
+//   int i;
+//   for (i = 0; i < _screen.width * _screen.height; i++) {
+//     fb[i] = i;
+//   }
+// }
+
 void _draw_rect(const uint32_t *pixels, int x, int y, int w, int h) {
-  int i;
-  for (i = 0; i < _screen.width * _screen.height; i++) {
-    fb[i] = i;
+  int cp_bytes = sizeof(uint32_t) * w;
+  for (int i = 0; i < h; i++) {
+    uint32_t *dst = &fb[(y + i) * _screen.width + x];
+    const uint32_t *src = pixels + i * w;
+    memcpy(dst, src, cp_bytes);
   }
 }
 
-void _draw_sync() {
+void _draw_sync() {//无需实现
 }
 
 int _read_key() {
+  if (inb(I8042_STATUS_PORT) & 0x1) {
+    return inl(I8042_DATA_PORT);
+  }
   return _KEY_NONE;
 }
