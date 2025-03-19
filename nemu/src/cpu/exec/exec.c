@@ -126,7 +126,7 @@ opcode_entry opcode_table [512] = {
   /* 0x24 */	EMPTY, IDEX(I2a, and), EMPTY, EMPTY,
   /*Pa2.2 0x28-2b sub指令*/
   /* 0x28 */	IDEXW(G2E, sub, 1), IDEX(G2E, sub), IDEXW(E2G, sub, 1), IDEX(E2G, sub),
-  /* 0x2c */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /* 0x2c */	IDEXW(I2a, sub, 1), IDEX(I2a, sub), EMPTY, EMPTY,
   //Pa2.1 0x31: xor r32 to r/m32
   /*Pa2.3 benchmark 0x0f 32-33: xor r/m32 to r32*/
   /* 0x30 */	IDEXW(G2E, xor, 1), IDEX(G2E, xor), IDEXW(E2G, xor, 1), IDEX(E2G, xor),
