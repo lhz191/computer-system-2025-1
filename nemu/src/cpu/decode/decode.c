@@ -43,7 +43,7 @@ static inline make_DopHelper(SI) {
   //将读取的数据作为有符号立即数存储在op->simm中
   //simm表示signed immediate，有符号立即数
   uint32_t imm = instr_fetch(eip, op->width);
-    printf("指令原始偏移量: 0x%x\n", imm);
+    // printf("指令原始偏移量: 0x%x\n", imm);
   // if (op->width == 1) {
   //   // 对8位立即数进行符号扩展
   //   op->simm = (int8_t)imm;
@@ -51,13 +51,13 @@ static inline make_DopHelper(SI) {
   //   op->simm = (int32_t)imm;
   // }
   rtl_sext(&imm, &imm, op->width);
-  printf("指令原始偏移量: 0x%x\n", imm);
+  // printf("指令原始偏移量: 0x%x\n", imm);
 
   op->simm = (int32_t)imm;
   // 根据操作数宽度进行符号扩展，使用RTL指令将立即数加载到操作数的val字段中
   rtl_li(&op->val, op->simm);
-  printf("指令大小: %d字节\n", op->width);
-  printf("指令原始偏移量: 0x%x\n", imm);
+  // printf("指令大小: %d字节\n", op->width);
+  // printf("指令原始偏移量: 0x%x\n", imm);
 #ifdef DEBUG
   snprintf(op->str, OP_STR_SIZE, "$0x%x", op->simm);
 #endif
