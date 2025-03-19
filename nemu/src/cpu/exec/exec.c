@@ -256,7 +256,8 @@ opcode_entry opcode_table [512] = {
   /* 0x84 */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
   /*Pa2.2 0x0f 88-8b: jmp rel8*/
   /* 0x88 */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
-  /* 0x8c */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /*Pa2.3 benchmark 0x0f 8c-8f: jmp rel8*/
+  /* 0x8c */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
   /* 0x90 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*0x0f 94 setcc*/
   /* 0x94 */	IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1), EMPTY, EMPTY,
