@@ -47,6 +47,9 @@ void pio_write(ioaddr_t, int, uint32_t);
 make_EHelper(in) {
   // TODO();
   // 从设备端口读取数据
+    // 从设备端口读取数据
+  uint32_t port_value = pio_read(id_src->val, id_dest->width);
+  printf("从端口 0x%x 读取值: 0x%x (宽度: %d)\n", id_src->val, port_value, id_dest->width);
   rtl_li(&t0, pio_read(id_src->val, id_dest->width));
   operand_write(id_dest, &t0);
 
@@ -58,6 +61,7 @@ make_EHelper(in) {
 }
 
 make_EHelper(out) {
+  printf("向端口 0x%x 写入值: 0x%x (宽度: %d)\n", id_dest->val, id_src->val, id_src->width);
   // 向设备端口写入数据
   pio_write(id_dest->val, id_src->width, id_src->val);
 
