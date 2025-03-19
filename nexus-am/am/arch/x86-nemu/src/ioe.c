@@ -4,10 +4,16 @@
 #define RTC_PORT 0x48   // Note that this is not standard
 static unsigned long boot_time;
 
+#define I8042_DATA_PORT 0x60
+#define I8042_STATUS_PORT 0x64
+
+
+/*Pa2.3 初始化*/
 void _ioe_init() {
   boot_time = inl(RTC_PORT);
 }
 
+/*Pa2.3 获取开机时间*/
 unsigned long _uptime() {
   unsigned long now = inl(RTC_PORT);
   return now - boot_time;
