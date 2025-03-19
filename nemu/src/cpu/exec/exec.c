@@ -126,7 +126,8 @@ opcode_entry opcode_table [512] = {
   /* 0x28 */	IDEXW(G2E, sub, 1), IDEX(G2E, sub), IDEXW(E2G, sub, 1), IDEX(E2G, sub),
   /* 0x2c */	EMPTY, EMPTY, EMPTY, EMPTY,
   //Pa2.1 0x31: xor r32 to r/m32
-  /* 0x30 */	IDEXW(G2E, xor, 1), IDEX(G2E, xor), EMPTY, EMPTY, 
+  /*Pa2.3 benchmark 0x0f 32-33: xor r/m32 to r32*/
+  /* 0x30 */	IDEXW(G2E, xor, 1), IDEX(G2E, xor), IDEXW(E2G, xor, 1), IDEX(E2G, xor),
   /* 0x34 */	EMPTY, IDEX(I2a, xor), EMPTY, EMPTY,
   /*Pa2.2 0x38-3b: cmp r/m32 to r32*/
   /* 0x38 */	IDEXW(G2E, cmp, 1), IDEX(G2E, cmp), IDEXW(E2G, cmp, 1), IDEX(E2G, cmp),
