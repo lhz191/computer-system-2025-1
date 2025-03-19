@@ -108,7 +108,7 @@ make_group(gp7,
 
 opcode_entry opcode_table [512] = {
   /*Pa2.1 0x00 add指令*/
-  /* 0x00 */	IDEXW(G2E, add, 1), IDEX(G2E, add), EMPTY, IDEX(E2G, add),
+  /* 0x00 */	IDEXW(G2E, add, 1), IDEX(G2E, add), IDEXW(E2G, add, 1), IDEX(E2G, add),
   /*Pa2.3 litenes 0x04-05: add r/m32 to r32*/
   /* 0x04 */	IDEXW(I2a, add, 1), IDEX(I2a, add), EMPTY, EMPTY,
   /*Pa2.2 0x09 or指令*/
