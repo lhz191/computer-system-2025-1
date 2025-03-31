@@ -68,7 +68,20 @@ typedef struct {
     uint32_t val;         // EFLAGS的32位值
   } eflags;
   
+
+
+  //Pa3.1 添加IDTR寄存器
+  struct {
+    uint32_t base;  // IDT的首地址
+    uint16_t limit; // IDT的长度
+  } idtr;
+
+  // 添加CS寄存器，用于特权级检查
+  uint16_t cs;
+
+
 } CPU_state;
+
 
 extern CPU_state cpu;
 
