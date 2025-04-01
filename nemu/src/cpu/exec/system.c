@@ -1,6 +1,7 @@
 #include "cpu/exec.h"
 #include "common.h"
 
+// 函数声明，放在文件开头
 void raise_intr(uint8_t NO, vaddr_t save_addr);
 void diff_test_skip_qemu();
 void diff_test_skip_nemu();
@@ -42,9 +43,15 @@ make_EHelper(int) {
   diff_test_skip_nemu();
 #endif
 }
-
+//Pa3.1 实现iret函数
 make_EHelper(iret) {
-  TODO();
+  // 从栈中弹出 EIP, CS, EFLAGS
+  rtl_pop(&decoding.jmp_eip);        // 恢复 EIP
+  rtl_pop(&cpu.cs);         // 恢复 CS
+  rtl_pop(&cpu.eflags.val); // 恢复 EFLAGS
+
+  // 设置 decoding.is_jmp 使 CPU 跳转到弹出的 EIP
+  decoding.is_jmp = 1;
 
   print_asm("iret");
 }
@@ -56,8 +63,8 @@ make_EHelper(in) {
   // TODO();
   // 从设备端口读取数据
     // 从设备端口读取数据
-  // uint32_t port_value = pio_read(id_src->val, id_dest->width);
-  // printf("从端口 0x%x 读取值: 0x%x (宽度: %d)\n", id_src->val, port_value, id_dest->width);
+  uint32_t port_value = pio_read(id_src->val, id_dest->width);
+  printf("从端口 0x%x 读取值: 0x%x (宽度: %d)\n", id_src->val, port_value, id_dest->width);
   rtl_li(&t0, pio_read(id_src->val, id_dest->width));
   operand_write(id_dest, &t0);
 
@@ -69,7 +76,7 @@ make_EHelper(in) {
 }
 
 make_EHelper(out) {
-  // printf("向端口 0x%x 写入值: 0x%x (宽度: %d)\n", id_dest->val, id_src->val, id_src->width);
+  printf("向端口 0x%x 写入值: 0x%x (宽度: %d)\n", id_dest->val, id_src->val, id_src->width);
   // 向设备端口写入数据
   pio_write(id_dest->val, id_src->width, id_src->val);
 
