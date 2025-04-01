@@ -162,7 +162,7 @@ opcode_entry opcode_table [512] = {
   
   //Pa2.1 0x58-5f pop %ebp指令。
   /* 0x5c */	IDEX(r, pop), IDEX(r, pop), IDEX(r, pop), IDEX(r, pop),  
-  /* 0x60 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /* 0x60 */	EX(pusha), EMPTY, EMPTY, EMPTY,
   /* 0x64 */	EMPTY, EMPTY, EX(operand_size), EMPTY,
   /*Pa2.1 0x68:push imm32*/
   /*Pa2.1 0x6a：push imm8*/

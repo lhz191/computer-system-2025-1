@@ -85,6 +85,7 @@ make_EHelper(cwtl);
 make_EHelper(int);
 make_EHelper(call_rm);
 make_EHelper(lidt);
+make_EHelper(pusha);
 /*Pa3.2 End*/
 
 
