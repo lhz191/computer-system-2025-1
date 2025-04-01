@@ -21,15 +21,36 @@ make_EHelper(pop) {
 
   print_asm_template1(pop);
 }
-
+//Pa3.1 push和pop指令的实现
 make_EHelper(pusha) {
-  TODO();
+  // 保存原始ESP值
+  t0 = cpu.esp;
+  
+  // 按照顺序压栈：EAX, ECX, EDX, EBX, ESP(原始值), EBP, ESI, EDI
+  rtl_push(&cpu.eax);
+  rtl_push(&cpu.ecx);
+  rtl_push(&cpu.edx);
+  rtl_push(&cpu.ebx);
+  rtl_push(&t0);  // 压入原始ESP值
+  rtl_push(&cpu.ebp);
+  rtl_push(&cpu.esi);
+  rtl_push(&cpu.edi);
 
   print_asm("pusha");
 }
-
+//根据 i386 手册，popa 指令的弹出顺序为：EDI, ESI, EBP, 
+//ESP(丢弃), EBX, EDX, ECX, EAX。
 make_EHelper(popa) {
-  TODO();
+  rtl_pop(&cpu.edi);
+  rtl_pop(&cpu.esi);
+  rtl_pop(&cpu.ebp);
+  
+  rtl_pop(&t0); // 丢弃ESP的值
+  
+  rtl_pop(&cpu.ebx);
+  rtl_pop(&cpu.edx);
+  rtl_pop(&cpu.ecx);
+  rtl_pop(&cpu.eax);
 
   print_asm("popa");
 }
