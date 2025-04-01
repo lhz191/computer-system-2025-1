@@ -8,11 +8,12 @@
 
 struct _RegSet {
   uintptr_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-  int       irq;
-  uintptr_t error_code;
+  int       irq;// 中断请求号
+  uintptr_t error_code;// 错误码
   uintptr_t eip, cs, eflags;
 };
 
+//宏定义的作用是从 _RegSet 结构体中提取系统调用的参数
 #define SYSCALL_ARG1(r) ((r)->eax)  // 系统调用号
 #define SYSCALL_ARG2(r) ((r)->ebx)  // 第一个参数
 #define SYSCALL_ARG3(r) ((r)->ecx)  // 第二个参数

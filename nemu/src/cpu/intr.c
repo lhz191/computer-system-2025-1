@@ -20,11 +20,12 @@ void raise_intr(uint8_t NO, vaddr_t save_addr) {
   uint32_t gate_addr = idt_addr + NO * 8; // 每个门描述符8字节
   
   // 3. 读取门描述符中的offset域
-  rtl_li(&t0, vaddr_read(gate_addr,2));
-  rtl_li(&t1, vaddr_read(gate_addr + 4, 4));
-
+  rtl_li(&t0, vaddr_read(gate_addr,2));//读取当前门低16位偏移量
+  rtl_li(&t1, vaddr_read(gate_addr + 4, 4));//高32位
+  
   // 4. 跳转到目标地址
   uint32_t target = (t1 & 0xffff0000) | (t0& 0xffff);
+  //高16与低16拼接（？暂时存疑，后续进行测试），//测试无误
   decoding.jmp_eip = target;
   decoding.is_jmp = 1;
 }
