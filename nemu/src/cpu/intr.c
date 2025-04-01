@@ -22,10 +22,8 @@ void raise_intr(uint8_t NO, vaddr_t save_addr) {
   // 3. 读取门描述符中的offset域
   rtl_li(&t0, vaddr_read(gate_addr,2));
   rtl_li(&t1, vaddr_read(gate_addr + 4, 4));
-// // 1. 将EFLAGS, CS, EIP保存到栈上
-//   rtl_push(&cpu.eflags.val);  // 保存EFLAGS
-//   rtl_push(&cpu.cs);          // 保存CS
-//   rtl_push(&save_addr);       // 保存EIP (下一条指令的地址)
+  
+  // 4. 跳转到目标地址
   uint32_t target = (t1 & 0xffff0000) | (t0& 0xffff);
   decoding.jmp_eip = target;
   decoding.is_jmp = 1;
