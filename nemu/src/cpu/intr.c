@@ -22,8 +22,9 @@ void raise_intr(uint8_t NO, vaddr_t save_addr) {
   // 3. 读取门描述符中的offset域
   uint32_t offset_low = vaddr_read(gate_addr, 2) & 0xffff;
   uint32_t offset_high = vaddr_read(gate_addr + 4, 4) & 0xffff;
-  uint32_t target = (offset_high << 16) | offset_low;
-  
+  uint32_t target = (offset_high & 0xffff0000) | (offset_low& 0xffff);
+  //   t1&=0xffff0000;
+  // decoding.jmp_eip = (t0 & 0xffff)|t1;
   // 4. 跳转到目标地址
   decoding.jmp_eip = target;
   decoding.is_jmp = 1;
