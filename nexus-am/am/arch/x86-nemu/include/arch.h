@@ -7,17 +7,14 @@
 #define PGSIZE    4096    // Bytes mapped by a page
 
 struct _RegSet {
-  uintptr_t edi, esi, ebp, esp, ebx, edx, ecx, eax;
-  int       irq;// 中断请求号
-  uintptr_t error_code;// 错误码
-  uintptr_t eip, cs, eflags;
+  uintptr_t esi, ebx, eax, eip, edx, error_code, eflags, ecx, cs, esp, edi, ebp;
+  int       irq;
 };
 
-//宏定义的作用是从 _RegSet 结构体中提取系统调用的参数
-#define SYSCALL_ARG1(r) ((r)->eax)  // 系统调用号
-#define SYSCALL_ARG2(r) ((r)->ebx)  // 第一个参数
-#define SYSCALL_ARG3(r) ((r)->ecx)  // 第二个参数
-#define SYSCALL_ARG4(r) ((r)->edx)  // 第三个参数
+#define SYSCALL_ARG1(r) 0
+#define SYSCALL_ARG2(r) 0
+#define SYSCALL_ARG3(r) 0
+#define SYSCALL_ARG4(r) 0
 
 #ifdef __cplusplus
 extern "C" {
