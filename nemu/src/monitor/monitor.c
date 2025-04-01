@@ -83,16 +83,15 @@ static inline void restart() {
   /* Set the initial instruction pointer. */
   cpu.eip = ENTRY_START;
   /*Pa2.1 Begin*/
-
   /*根据Intel的i386手册第10章（"Initialization"章节），
   EFLAGS寄存器在CPU复位或初始化时的值被设定为0x00000002。
   bit 1 = 1，其他位都是0，历史遗留特性*/
   /* EFLAGS初始值为0x2，即第1位为1 */
-  
   cpu.eflags.val = 0x2;
-
   /*Pa2.2 End*/
-
+  /*Pa3.2 Begin*/
+  cpu.cs = 8;
+  /*Pa3.2 End*/
 
 #ifdef DIFF_TEST
   init_qemu_reg();
