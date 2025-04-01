@@ -12,6 +12,12 @@ _RegSet* do_syscall(_RegSet *r) {
       SYSCALL_ARG1(r) = 1;
       break;
     }
+    case SYS_exit: {
+      // 获取退出状态参数
+      uintptr_t exit_status = SYSCALL_ARG2(r);
+      _halt(exit_status);  // 调用 _halt() 以退出
+      break;
+    }
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 
