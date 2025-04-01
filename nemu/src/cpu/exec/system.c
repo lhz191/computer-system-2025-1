@@ -1,7 +1,6 @@
 #include "cpu/exec.h"
 #include "common.h"
 
-// 函数声明，放在文件开头
 void raise_intr(uint8_t NO, vaddr_t save_addr);
 void diff_test_skip_qemu();
 void diff_test_skip_nemu();
