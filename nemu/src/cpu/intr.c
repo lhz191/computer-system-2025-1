@@ -16,14 +16,17 @@ void raise_intr(uint8_t NO, vaddr_t save_addr) {
   // rtl_push(&save_addr);       // 保存EIP (下一条指令的地址)
   
   // 2. 根据中断号从IDT中查找门描述符
-  uint32_t idt_addr = cpu.idtr.base;
-  uint32_t gate_addr = idt_addr + NO * 8; // 每个门描述符8字节
+  // uint32_t idt_addr = cpu.idtr.base;
+  // uint32_t gate_addr = idt_addr + NO * 8; // 每个门描述符8字节
   
   // 3. 读取门描述符中的offset域
-  uint32_t offset_low = vaddr_read(gate_addr, 2) & 0xffff;
-  uint32_t offset_high = vaddr_read(gate_addr + 4, 4) & 0xffff;
-  uint32_t target = (offset_high & 0xffff0000) | (offset_low& 0xffff);
-  rtl_push(&cpu.eflags.val);  // 保存EFLAGS
+  // uint32_t offset_low = vaddr_read(gate_addr, 2) & 0xffff;
+  // uint32_t offset_high = vaddr_read(gate_addr + 4, 4) & 0xffff;
+  rtl_li(&t0, vaddr_read(cpu.idtr.base+8*NO,2));
+  rtl_li(&t1, vaddr_read(cpu.idtr.base+8*NO+4, 4));
+
+  uint32_t target = (t1 & 0xffff0000) | (t0& 0xffff);
+    rtl_push(&cpu.eflags.val);  // 保存EFLAGS
   rtl_push(&cpu.cs);          // 保存CS
   rtl_push(&save_addr);       // 保存EIP (下一条指令的地址)
   //   t1&=0xffff0000;
