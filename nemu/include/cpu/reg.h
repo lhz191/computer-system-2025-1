@@ -77,7 +77,7 @@ typedef struct {
   } idtr;
 
   // 添加CS寄存器，用于特权级检查
-  uint16_t cs;
+  uint32_t cs;
 
 
 } CPU_state;

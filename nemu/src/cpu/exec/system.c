@@ -1,14 +1,15 @@
 #include "cpu/exec.h"
-
+#include "common.h"
+#include "../src/cpu/intr.c"
 void diff_test_skip_qemu();
 void diff_test_skip_nemu();
 //Pa3.2 实现lidt指令
 make_EHelper(lidt) {
-  rtl_li(&addr, id_dest->addr);
+  rtl_li(&t0, id_dest->addr);
   
   // 读取limit和base
-  cpu.idtr.limit = vaddr_read(addr, 2);
-  cpu.idtr.base = vaddr_read(addr + 2, 4);
+  cpu.idtr.limit = vaddr_read(t0, 2);
+  cpu.idtr.base = vaddr_read(t0 + 2, 4);
   
   print_asm_template1(lidt);
 }
@@ -33,13 +34,8 @@ make_EHelper(mov_cr2r) {
 //Pa3.2 实现中断函数
 make_EHelper(int) {
   // 从指令中获取中断号
-  uint8_t intr_no = decoding.opcode & 0xff;
-  
-  // 调用raise_intr函数触发中断
-  // 传入当前指令的下一条指令地址（当前EIP + 指令长度）
-  raise_intr(intr_no, decoding.seq_eip);
-  
-  print_asm("int %x", intr_no);
+  raise_intr(id_dest->val, decoding.seq_eip);
+  print_asm("int %s", id_dest->str);
 
 #ifdef DIFF_TEST
   diff_test_skip_nemu();
@@ -82,3 +78,5 @@ make_EHelper(out) {
   diff_test_skip_qemu();
 #endif
 }
+
+// void raise_intr(uint8_t NO, vaddr_t save_addr);
