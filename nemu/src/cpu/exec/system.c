@@ -1,8 +1,11 @@
 #include "cpu/exec.h"
 #include "common.h"
-#include "../src/cpu/intr.c"
+
+// 函数声明，放在文件开头
+void raise_intr(uint8_t NO, vaddr_t save_addr);
 void diff_test_skip_qemu();
 void diff_test_skip_nemu();
+
 //Pa3.2 实现lidt指令
 make_EHelper(lidt) {
   rtl_li(&t0, id_dest->addr);
@@ -33,7 +36,6 @@ make_EHelper(mov_cr2r) {
 
 //Pa3.2 实现中断函数
 make_EHelper(int) {
-  // 从指令中获取中断号
   raise_intr(id_dest->val, decoding.seq_eip);
   print_asm("int %s", id_dest->str);
 
@@ -78,5 +80,3 @@ make_EHelper(out) {
   diff_test_skip_qemu();
 #endif
 }
-
-// void raise_intr(uint8_t NO, vaddr_t save_addr);
