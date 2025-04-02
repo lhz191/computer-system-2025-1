@@ -3,14 +3,9 @@
 
 int main() {
   write(1, "Hello World!\n", 13);
-  int i = 2;
-  volatile int j = 0;
+  int j=1;
   while (1) {
-    j ++;
-    if (j == 10000) {
-      printf("Hello World for the %dth time\n", i ++);
-      j = 0;
-    }
+    printf("Hello World for the %dth time\n", j ++);
   }
   return 0;
 }
