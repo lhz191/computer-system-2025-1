@@ -5,7 +5,25 @@
 ssize_t fs_write(int fd, const void *buf, size_t len);
 // off_t fs_lseek(int fd, off_t offset, int whence);
 // int fs_close(int fd);
-
+static inline _RegSet* sys_write(_RegSet *r){
+  /*int fd = (int)SYSCALL_ARG2(r);
+  char *buf = (char *)SYSCALL_ARG3(r);
+  int len = (int)SYSCALL_ARG4(r);
+  //Log("?");
+  if(fd == 1 || fd == 2){
+      for(int i = 0; i < len; i++) {
+          _putc(buf[i]);
+      }
+      //根据man 返回len
+      SYSCALL_ARG1(r) = SYSCALL_ARG4(r);
+  }
+  return NULL;*/
+  int fd = (int)SYSCALL_ARG2(r);
+  char *buf = (char *)SYSCALL_ARG3(r);
+  int len = (int)SYSCALL_ARG4(r);
+  SYSCALL_ARG1(r) = fs_write(fd,buf,len);
+  return NULL;
+}
 
 _RegSet* do_syscall(_RegSet *r) {
   uintptr_t a[4]; // 用于存储系统调用参数
@@ -25,19 +43,7 @@ _RegSet* do_syscall(_RegSet *r) {
       break;
     }
     case SYS_write: {
-      int fd = SYSCALL_ARG2(r);  // 获取文件描述符
-      const char *buf = (const char *)SYSCALL_ARG3(r);  // 获取缓冲区地址
-      size_t len = SYSCALL_ARG4(r);  // 获取写入长度
-
-      // if (fd == 1 || fd == 2) {  // 如果是 stdout 或 stderr
-      //   for (size_t i = 0; i < len; i++) {
-      //     _putc(buf[i]);  // 使用 _putc 输出字符
-      //   }
-      //    SYSCALL_ARG1(r) = len;  // 返回写入的字节数
-      // } 
-      SYSCALL_ARG1(r) = fs_write(fd,buf,len);
-      return NULL;
-      break;
+return sys_write(r);
     }
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
