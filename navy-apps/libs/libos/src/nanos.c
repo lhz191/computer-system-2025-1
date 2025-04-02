@@ -26,7 +26,6 @@ int _open(const char *path, int flags, mode_t mode) {
 }
 /*Pa3.2 write系统调用*/
 int _write(int fd, void *buf, size_t count){
-
   return _syscall_(SYS_write, fd, (uintptr_t)buf, count);
 }
 
@@ -34,6 +33,7 @@ int _write(int fd, void *buf, size_t count){
 extern char _end;
 // 用于记录当前program break的位置
 static uintptr_t program_break = 0;
+
 void *_sbrk(intptr_t increment) {
   // 第一次调用时初始化program break
   if (program_break == 0) {
@@ -45,6 +45,8 @@ void *_sbrk(intptr_t increment) {
   uintptr_t new_break = program_break + increment;
   // 调用SYS_brk系统调用设置新的program break
   int ret = _syscall_(SYS_brk, new_break, 0, 0);
+  Log("[DEBUG] _sbrk called: increment=%d, old_break=0x%lx, new_break=0x%lx, ret=%d", 
+      increment, old_break, new_break, ret);
   if (ret == 0) {
     // 系统调用成功，更新记录的program break
     program_break = new_break;
