@@ -88,8 +88,6 @@ make_EHelper(lidt);
 make_EHelper(pusha);
 make_EHelper(popa);
 make_EHelper(iret);
-// make_EHelper(mov_r2cr);
-// make_EHelper(mov_cr2r);
 /*Pa3.2 End*/
 
 
