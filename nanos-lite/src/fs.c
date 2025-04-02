@@ -27,28 +27,36 @@ extern void ramdisk_write(const void *buf, off_t offset, size_t len);
 void init_fs() {
   // TODO: initialize the size of /dev/fb
 }
-ssize_t fs_write(int fd, const void *buf, size_t len) {
-  //1.stdout：将数据输出到串口或控制台。
-  //2.stderr：用于标准错误输出。
-  //3./dev/fb：用于写入帧缓冲区。写入的数据通常是图像数据，需要按照特定的格式（如 RGB）写入帧缓冲区。
-  if (fd == FD_STDOUT || fd == FD_STDERR) {
-    for (size_t i = 0; i < len; i++) {
-      _putc(((char *)buf)[i]);  // 输出到串口
+ssize_t fs_write(int fd, const void* buf, size_t len){
+  ssize_t f_size = file_table[fd].size;
+  switch(fd){
+    case FD_STDOUT:
+    case FD_STDERR:{
+      // stdout stderr
+      for(int i=0;i<len;i++){
+        _putc(((char*)buf)[i]);
+      }
+      break;
     }
-    return len;
+    case FD_FB:{
+      // frame buffer
+      fb_write(buf, file_table[fd].open_offset, len);
+      file_table[fd].open_offset+=len;
+      break;
+    }
+    default:{
+      if(file_table[fd].open_offset + len > f_size){
+        len = f_size - file_table[fd].open_offset;
+      }
+      // Log("Writing %s..open_offset:%d,disk_offset:%d,len:%d",
+      // file_table[fd].name,
+      // file_table[fd].open_offset,
+      // file_table[fd].disk_offset,
+      // len);
+      ramdisk_write(buf, file_table[fd].disk_offset + file_table[fd].open_offset, len);
+      file_table[fd].open_offset += len;
+      break;
+    }
   }
-  else if(fd == FD_FB)
-  {
-    fb_write(buf,file_table[fd].open_offset,len);
-    file_table[fd].open_offset+=len;
-    return len;
-  }
-  // 其他文件的写入操作
-  Finfo *f = &file_table[fd];
-  if (f->open_offset + len > f->size) {
-    len = f->size - f->open_offset;  // 调整写入长度
-  }
-  ramdisk_write(buf,f->disk_offset + f->open_offset, len);
-  f->open_offset += len;  // 更新偏移量
   return len;
 }
