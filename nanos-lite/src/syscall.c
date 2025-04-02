@@ -6,11 +6,11 @@ ssize_t fs_write(int fd, const void *buf, size_t len);
 // off_t fs_lseek(int fd, off_t offset, int whence);
 // int fs_close(int fd);
 
-// // 为了强制单字符输出，sys_brk总是返回失败
-// static int sys_brk(uintptr_t addr) {
-//   // 返回0表示失败，这样会迫使printf()逐字符输出
-//   return 0;
-// }
+// 为了强制单字符输出，sys_brk总是返回失败
+static int sys_brk(uintptr_t addr) {
+  // 返回0表示失败，这样会迫使printf()逐字符输出
+  return 0;
+}
 
 _RegSet* do_syscall(_RegSet *r) {
   uintptr_t a[4]; // 用于存储系统调用参数
@@ -40,14 +40,18 @@ _RegSet* do_syscall(_RegSet *r) {
       //   }
       //    SYSCALL_ARG1(r) = len;  // 返回写入的字节数
       // } 
-      Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
+      // Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
 
       SYSCALL_ARG1(r) = fs_write(fd,buf,len);
       return NULL;
       break;
     }
     case SYS_brk: {
-r->eax = 0; break;
+      // 获取新的program break地址
+      uintptr_t addr = SYSCALL_ARG2(r);
+      // 调用sys_brk处理
+      SYSCALL_ARG1(r) = sys_brk(addr);
+      break;
     }
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
