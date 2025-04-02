@@ -20,6 +20,7 @@ static Finfo file_table[] __attribute__((used)) = {
 #include "files.h"
 };
 extern void fb_write(const void *buf, off_t offset, size_t len);
+extern void ramdisk_write(const void *buf, off_t offset, size_t len);
 
 #define NR_FILES (sizeof(file_table) / sizeof(file_table[0]))
 
@@ -47,7 +48,7 @@ ssize_t fs_write(int fd, const void *buf, size_t len) {
   if (f->open_offset + len > f->size) {
     len = f->size - f->open_offset;  // 调整写入长度
   }
-  ramdisk_write(f->disk_offset + f->open_offset, buf, len);
+  ramdisk_write(buf,f->disk_offset + f->open_offset, len);
   f->open_offset += len;  // 更新偏移量
   return len;
 }
