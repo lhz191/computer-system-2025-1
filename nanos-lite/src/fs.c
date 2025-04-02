@@ -50,5 +50,6 @@ ssize_t fs_write(int fd, const void *buf, size_t len) {
   }
   ramdisk_write(buf,f->disk_offset + f->open_offset, len);
   f->open_offset += len;  // 更新偏移量
+  Log("offset = %d", file_table[fd].open_offset);
   return len;
 }

@@ -1,88 +1,58 @@
 #include "common.h"
 #include "syscall.h"
-
 // int fs_open(const char *pathname, int flags, int mode);
 // ssize_t fs_read(int fd, void *buf, size_t len);
 ssize_t fs_write(int fd, const void *buf, size_t len);
 // off_t fs_lseek(int fd, off_t offset, int whence);
 // int fs_close(int fd);
 
-// extern int mm_brk(uint32_t new_brk);
+// 为了强制单字符输出，sys_brk总是返回失败
+static int sys_brk(uintptr_t addr) {
+  // 返回0表示失败，这样会迫使printf()逐字符输出
+  return 0;
+}
 
-static inline _RegSet* sys_none(_RegSet *r){
-  SYSCALL_ARG1(r) = 1; //约定系统调用返回值存于此，即eax
-  return NULL;
-}
-static inline _RegSet* sys_exit(_RegSet *r){
-  //接受一个退出状态的参数，顺序ebx ecx edx
-  _halt(SYSCALL_ARG2(r)); 
-  return NULL;
-}
-static inline _RegSet* sys_write(_RegSet *r){
-  /*int fd = (int)SYSCALL_ARG2(r);
-  char *buf = (char *)SYSCALL_ARG3(r);
-  int len = (int)SYSCALL_ARG4(r);
-  //Log("?");
-  if(fd == 1 || fd == 2){
-      for(int i = 0; i < len; i++) {
-          _putc(buf[i]);
-      }
-      //根据man 返回len
-      SYSCALL_ARG1(r) = SYSCALL_ARG4(r);
-  }
-  return NULL;*/
-  int fd = (int)SYSCALL_ARG2(r);
-  char *buf = (char *)SYSCALL_ARG3(r);
-  int len = (int)SYSCALL_ARG4(r);
-  SYSCALL_ARG1(r) = fs_write(fd,buf,len);
-  return NULL;
-}
-static inline _RegSet* sys_brk(_RegSet *r) {
-  //pa3 总是返回0，表示堆区大小总是调整成功
-  //Log("!");
-  SYSCALL_ARG1(r) = 0;
-  //pa4.1 真正的调整堆区
-  // SYSCALL_ARG1(r) = mm_brk(SYSCALL_ARG2(r));
-  return NULL;
-}
-// static inline _RegSet* sys_open(_RegSet *r) {
-//   const char* pathname = (const char*)SYSCALL_ARG2(r);
-//   int flags = (int)SYSCALL_ARG3(r);
-//   int mode = (int)SYSCALL_ARG4(r);
-//   SYSCALL_ARG1(r) = fs_open(pathname,flags,mode);
-//   return NULL;
-// }
-// static inline _RegSet* sys_read(_RegSet *r) {
-//   int fd = (int)SYSCALL_ARG2(r);
-//   char *buf = (char *)SYSCALL_ARG3(r);
-//   int len = (int)SYSCALL_ARG4(r);
-//   SYSCALL_ARG1(r) = fs_read(fd,buf,len);
-//   return NULL;
-// }
-// static inline _RegSet* sys_close(_RegSet *r) {
-//   int fd = (int)SYSCALL_ARG2(r);
-//   SYSCALL_ARG1(r) = fs_close(fd);
-//   return NULL;
-// }
-// static inline _RegSet* sys_lseek(_RegSet *r) {
-//   int fd = (int)SYSCALL_ARG2(r);
-//   off_t offset = (off_t)SYSCALL_ARG3(r);
-//   int whence = (int)SYSCALL_ARG4(r);
-//   SYSCALL_ARG1(r) = fs_lseek(fd,offset,whence);
-//   return NULL;
-// }
 _RegSet* do_syscall(_RegSet *r) {
-  uintptr_t a[4];
-  a[0] = SYSCALL_ARG1(r);
+  uintptr_t a[4]; // 用于存储系统调用参数
+  a[0] = SYSCALL_ARG1(r);// 获取系统调用号，根据之前的实现，存储在eax中
+
   switch (a[0]) {
-    case SYS_none:return sys_none(r);
-    case SYS_exit:return sys_exit(r);
-    case SYS_write:return sys_write(r);
-    case SYS_brk:return sys_brk(r);
-    // case SYS_open:return sys_open(r);
-    // case SYS_read:return sys_read(r);
-    // case SYS_close:return sys_close(r);
-    // case SYS_lseek:return sys_lseek(r);
+    case SYS_none:{
+    //SYS_none 是一个系统调用的标识符
+    //通常用于表示一个不执行任何操作的系统调用。返回值置1，return null
+      SYSCALL_ARG1(r) = 1;
+      break;
+    }
+    case SYS_exit: {
+      // 获取退出状态参数
+      uintptr_t exit_status = SYSCALL_ARG2(r);
+      _halt(exit_status);  // 调用 _halt() 以退出
+      break;
+    }
+    case SYS_write: {
+      int fd = SYSCALL_ARG2(r);  // 获取文件描述符
+      const char *buf = (const char *)SYSCALL_ARG3(r);  // 获取缓冲区地址
+      size_t len = SYSCALL_ARG4(r);  // 获取写入长度
+
+      // if (fd == 1 || fd == 2) {  // 如果是 stdout 或 stderr
+      //   for (size_t i = 0; i < len; i++) {
+      //     _putc(buf[i]);  // 使用 _putc 输出字符
+      //   }
+      //    SYSCALL_ARG1(r) = len;  // 返回写入的字节数
+      // } 
+      Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
+
+      SYSCALL_ARG1(r) = fs_write(fd,buf,len);
+      return NULL;
+      break;
+    }
+    case SYS_brk: {
+      // 获取新的program break地址
+      uintptr_t addr = SYSCALL_ARG2(r);
+      // 调用sys_brk处理
+      SYSCALL_ARG1(r) = sys_brk(addr);
+      break;
+    }
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 
