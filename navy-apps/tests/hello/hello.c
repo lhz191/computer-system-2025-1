@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 int main() {
-  write(1, "Hello World!\n", 13);
   int i = 2;
+  printf("%d\n", i);  // 使用格式化字符串输出整数
   return 0;
 }
