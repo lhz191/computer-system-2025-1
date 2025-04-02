@@ -29,32 +29,19 @@ int _write(int fd, void *buf, size_t count){
   return _syscall_(SYS_write, fd, (uintptr_t)buf, count);
 }
 
-// 声明_end符号，它标记数据段结束的位置
 extern char _end;
-// 用于记录当前program break的位置
-static uintptr_t program_break = 0;
-void *_sbrk(intptr_t increment) {
-  // 第一次调用时初始化program break
-  if (program_break == 0) {
-    program_break = (uintptr_t)&_end;
+static intptr_t brk = (intptr_t)&_end;
+void *_sbrk(intptr_t increment){
+  intptr_t ori_brk = brk;
+  intptr_t new_brk = ori_brk + increment;
+  // char a[]="**log**";
+  // write(66,a,sizeof(a));
+  if(_syscall_(SYS_brk, new_brk, 0, 0) == 0){
+    brk = new_brk;
+    return (void*) ori_brk;
   }
-  // 保存旧的program break
-  uintptr_t old_break = program_break;
-  // 计算新的program break
-  uintptr_t new_break = program_break + increment;
-  // 调用SYS_brk系统调用设置新的program break
-  int ret = _syscall_(SYS_brk, new_break, 0, 0);
-  if (ret == 0) {
-    // 系统调用成功，更新记录的program break
-    program_break = new_break;
-    // 返回旧的program break位置
-    return (void *)old_break;
-  } else {
-    // 系统调用失败，返回-1
-    return (void *)-1;
-  }
+  else return (void *)-1;
 }
-
 int _read(int fd, void *buf, size_t count) {
   _exit(SYS_read);
 }
