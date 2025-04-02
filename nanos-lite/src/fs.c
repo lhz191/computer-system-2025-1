@@ -19,6 +19,7 @@ static Finfo file_table[] __attribute__((used)) = {
   [FD_DISPINFO] = {"/proc/dispinfo", 128, 0},
 #include "files.h"
 };
+extern void fb_write(const void *buf, off_t offset, size_t len);
 
 #define NR_FILES (sizeof(file_table) / sizeof(file_table[0]))
 
@@ -26,10 +27,19 @@ void init_fs() {
   // TODO: initialize the size of /dev/fb
 }
 ssize_t fs_write(int fd, const void *buf, size_t len) {
+  //1.stdout：将数据输出到串口或控制台。
+  //2.stderr：用于标准错误输出。
+  //3./dev/fb：用于写入帧缓冲区。写入的数据通常是图像数据，需要按照特定的格式（如 RGB）写入帧缓冲区。
   if (fd == FD_STDOUT || fd == FD_STDERR) {
     for (size_t i = 0; i < len; i++) {
       _putc(((char *)buf)[i]);  // 输出到串口
     }
+    return len;
+  }
+  else if(fd == FD_FB)
+  {
+    fb_write(buf,file_table[fd].open_offset,len);
+    file_table[fd].open_offset+=len;
     return len;
   }
   // 其他文件的写入操作
