@@ -89,7 +89,7 @@ make_EHelper(sar) {
   operand_write(id_dest, &t0);
   
   // 4. 更新标志位
-  rtl_update_ZFSF(&id_dest->val, id_dest->width);
+  rtl_update_ZFSF(&t0, id_dest->width);
   
   // CF和OF在NEMU中不需要更新，注释已说明
   
@@ -104,7 +104,7 @@ make_EHelper(shl) {
   operand_write(id_dest, &t0);
   
   // 3. 更新标志位
-  rtl_update_ZFSF(&id_dest->val, id_dest->width);
+  rtl_update_ZFSF(&t0, id_dest->width);
   
   // CF和OF在NEMU中不需要更新，注释已说明
   
@@ -145,7 +145,7 @@ make_EHelper(shr) {
   operand_write(id_dest, &t0);
   
   // 3. 更新标志位
-  rtl_update_ZFSF(&id_dest->val, id_dest->width);
+  rtl_update_ZFSF(&t0, id_dest->width);
   
   // CF和OF在NEMU中不需要更新，注释已说明
   
