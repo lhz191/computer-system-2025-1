@@ -6,12 +6,18 @@ ssize_t fs_write(int fd, const void *buf, size_t len);
 // off_t fs_lseek(int fd, off_t offset, int whence);
 // int fs_close(int fd);
 
-// 为了强制单字符输出，sys_brk总是返回失败
-static int sys_brk(uintptr_t addr) {
-  // 返回-1表示失败，这样会迫使printf()逐字符输出
-  return 0;
+// // 为了强制单字符输出，sys_brk总是返回失败
+// static int sys_brk(uintptr_t addr) {
+//   // 返回-1表示失败，这样会迫使printf()逐字符输出
+//   return -1;
+// }
+static inline _RegSet* sys_brk(_RegSet *r) {
+  // pa3 总是返回0，表示堆区大小总是调整成功
+  SYSCALL_ARG1(r) = 0;
+  // //pa4.1 真正的调整堆区
+  // SYSCALL_ARG1(r) = mm_brk(SYSCALL_ARG2(r));
+  return NULL;
 }
-
 _RegSet* do_syscall(_RegSet *r) {
   uintptr_t a[4]; // 用于存储系统调用参数
   a[0] = SYSCALL_ARG1(r);// 获取系统调用号，根据之前的实现，存储在eax中
@@ -30,9 +36,11 @@ _RegSet* do_syscall(_RegSet *r) {
       break;
     }
     case SYS_write: {
+
       int fd = SYSCALL_ARG2(r);  // 获取文件描述符
       const char *buf = (const char *)SYSCALL_ARG3(r);  // 获取缓冲区地址
       size_t len = SYSCALL_ARG4(r);  // 获取写入长度
+      Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
 
       // if (fd == 1 || fd == 2) {  // 如果是 stdout 或 stderr
       //   for (size_t i = 0; i < len; i++) {
@@ -45,10 +53,11 @@ _RegSet* do_syscall(_RegSet *r) {
       break;
     }
     case SYS_brk: {
-      // 获取新的program break地址
-      uintptr_t addr = SYSCALL_ARG2(r);
-      // 调用sys_brk处理
-      SYSCALL_ARG1(r) = sys_brk(addr);
+      // // 获取新的program break地址
+      // uintptr_t addr = SYSCALL_ARG2(r);
+      // // 调用sys_brk处理
+      // SYSCALL_ARG1(r) = sys_brk(addr);
+      return sys_brk(r);
       break;
     }
     default: panic("Unhandled syscall ID = %d", a[0]);

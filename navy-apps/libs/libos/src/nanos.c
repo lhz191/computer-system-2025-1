@@ -26,7 +26,6 @@ int _open(const char *path, int flags, mode_t mode) {
 }
 /*Pa3.2 write系统调用*/
 int _write(int fd, void *buf, size_t count){
-  Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
 
   return _syscall_(SYS_write, fd, (uintptr_t)buf, count);
 }
