@@ -9,7 +9,7 @@ ssize_t fs_write(int fd, const void *buf, size_t len);
 // 为了强制单字符输出，sys_brk总是返回失败
 static int sys_brk(uintptr_t addr) {
   // 返回-1表示失败，这样会迫使printf()逐字符输出
-  return -1;
+  return 0;
 }
 
 _RegSet* do_syscall(_RegSet *r) {
