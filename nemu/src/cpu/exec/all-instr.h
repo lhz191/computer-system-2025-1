@@ -81,14 +81,16 @@ make_EHelper(cwtl);
 /*Pa2.3 End*/
 
 
-/*Pa3.1 Begin*/
+/*Pa3.2 Begin*/
 make_EHelper(int);
 make_EHelper(call_rm);
 make_EHelper(lidt);
 make_EHelper(pusha);
 make_EHelper(popa);
 make_EHelper(iret);
-/*Pa3.1 End*/
+make_EHelper(mov_r2cr);
+make_EHelper(mov_cr2r);
+/*Pa3.2 End*/
 
 
 
