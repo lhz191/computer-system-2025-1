@@ -40,7 +40,7 @@ make_EHelper(call) {
   // printf("跳转目标: 0x%x\n", decoding.jmp_eip);
   
   // 不要直接设置cpu.eip
-  cpu.eip = decoding.jmp_eip; //<- 删除这行
+  // cpu.eip = decoding.jmp_eip; <- 删除这行
 
   print_asm("call %x", decoding.jmp_eip);
 }
