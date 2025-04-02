@@ -18,6 +18,21 @@ _RegSet* do_syscall(_RegSet *r) {
       _halt(exit_status);  // 调用 _halt() 以退出
       break;
     }
+    case SYS_write: {
+      int fd = SYSCALL_ARG2(r);  // 获取文件描述符
+      const char *buf = (const char *)SYSCALL_ARG3(r);  // 获取缓冲区地址
+      size_t len = SYSCALL_ARG4(r);  // 获取写入长度
+
+      if (fd == 1 || fd == 2) {  // 如果是 stdout 或 stderr
+        for (size_t i = 0; i < len; i++) {
+          _putc(buf[i]);  // 使用 _putc 输出字符
+        }
+        SYSCALL_ARG1(r) = len;  // 返回写入的字节数
+      } else {
+        SYSCALL_ARG1(r) = -1;  // 返回错误
+      }
+      break;
+    }
     default: panic("Unhandled syscall ID = %d", a[0]);
   }
 
