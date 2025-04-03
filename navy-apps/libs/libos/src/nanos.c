@@ -21,53 +21,50 @@ void _exit(int status) {
   _syscall_(SYS_exit, status, 0, 0);
 }
 
+/*Pa3.2 open系统调用*/
 int _open(const char *path, int flags, mode_t mode) {
-  _exit(SYS_open);
+  return _syscall_(SYS_open, (uintptr_t)path, flags, mode);
 }
 /*Pa3.2 write系统调用*/
 int _write(int fd, void *buf, size_t count){
   return _syscall_(SYS_write, fd, (uintptr_t)buf, count);
 }
 
-// 声明_end符号，它标记数据段结束的位置
+//_end符号用来标记数据段结束的位置
 extern char _end;
-// 用于记录当前program break的位置
+//记录当前program break的位置
 static uintptr_t program_break = 0;
 
 void *_sbrk(intptr_t increment) {
-  // 第一次调用时初始化program break
-  if (program_break == 0) {
+  if (program_break == 0) {// 第一次调用我们需要初始化program break
     program_break = (uintptr_t)&_end;
   }
-  // 保存旧的program break
-  uintptr_t old_break = program_break;
-  // 计算新的program break
+  uintptr_t old_break = program_break;// 保存旧的program break
   uintptr_t new_break = program_break + increment;
-  // 调用SYS_brk系统调用设置新的program break
-  int ret = _syscall_(SYS_brk, new_break, 0, 0);
-  // Log("[DEBUG] _sbrk called: increment=%d, old_break=0x%lx, new_break=0x%lx, ret=%d", 
-  //     increment, old_break, new_break, ret);
+  int ret = _syscall_(SYS_brk, new_break, 0, 0);// 调用SYS_brk系统调用设置新的program break
+  Log("[DEBUG] _sbrk called: increment=%d, old_break=0x%lx, new_break=0x%lx, ret=%d", 
+      increment, old_break, new_break, ret);
   if (ret == 0) {
-    // 系统调用成功，更新记录的program break
-    program_break = new_break;
-    // 返回旧的program break位置
-    return (void *)old_break;
+    program_break = new_break;// 更新记录的program break
+    return (void *)old_break;// 返回旧的program break位置
   } else {
-    // 系统调用失败，返回-1
-    return (void *)-1;
+    return (void *)-1;// 系统调用失败，返回-1
   }
 }
 
+/*Pa3.2 read系统调用*/
 int _read(int fd, void *buf, size_t count) {
-  _exit(SYS_read);
+  return _syscall_(SYS_read, fd, (uintptr_t)buf, count);
 }
 
+/*Pa3.2 close系统调用*/
 int _close(int fd) {
-  _exit(SYS_close);
+  return _syscall_(SYS_close, fd, 0, 0);
 }
 
+/*Pa3.2 lseek系统调用*/
 off_t _lseek(int fd, off_t offset, int whence) {
-  _exit(SYS_lseek);
+  return _syscall_(SYS_lseek, fd, offset, whence);
 }
 
 // The code below is not used by Nanos-lite.
