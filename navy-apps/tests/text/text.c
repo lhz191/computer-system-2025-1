@@ -3,7 +3,6 @@
 
 int main() {
   FILE *fp = fopen("/share/texts/num", "r+");
-  assert(fp);
 
   fseek(fp, 0, SEEK_END);
   long size = ftell(fp);
