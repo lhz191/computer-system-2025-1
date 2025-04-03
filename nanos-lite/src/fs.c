@@ -52,6 +52,7 @@ int fs_open(const char *pathname, int flags, int mode) {
 //Pa3.2 获取文件大小
 size_t fs_filesz(int fd) {
   // assert(fd >= 0 && fd < sizeof(file_table) / sizeof(Finfo));
+  Log("get_size");
   return file_table[fd].size;
 }
 

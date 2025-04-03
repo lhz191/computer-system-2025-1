@@ -18,6 +18,9 @@ uintptr_t loader(_Protect *as, const char *filename) {
 
 
   int fd = fs_open(filename, 0, 0);// 打开指定的文件
+  if (fd < 0) {
+    panic("loader: cannot open file '%s'", filename);
+  }
   size_t size = fs_filesz(fd);// 获取文件大小
   Log("loader: loading '%s' (%d bytes) to memory address 0x%x", 
       filename, size, (uintptr_t)DEFAULT_ENTRY);
