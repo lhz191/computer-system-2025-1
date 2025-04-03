@@ -40,10 +40,9 @@ _RegSet* do_syscall(_RegSet *r) {
       //   }
       //    SYSCALL_ARG1(r) = len;  // 返回写入的字节数
       // } 
-      // Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
+      Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
 
       SYSCALL_ARG1(r) = fs_write(fd,buf,len);
-      return NULL;
       break;
     }
     case SYS_brk: {
