@@ -113,10 +113,10 @@ static inline void rtl_sr(int r, int width, const rtlreg_t* src1) {
 
 #define make_rtl_setget_eflags(f) \
   static inline void concat(rtl_set_, f) (const rtlreg_t* src) { \
-    cpu.eflags.f = *src; \
+    cpu.eflags.f=*src; \
   } \
   static inline void concat(rtl_get_, f) (rtlreg_t* dest) { \
-    *dest = cpu.eflags.f; \
+    *dest=cpu.eflags.f; \
   }
 
 make_rtl_setget_eflags(CF)
@@ -124,33 +124,18 @@ make_rtl_setget_eflags(OF)
 make_rtl_setget_eflags(ZF)
 make_rtl_setget_eflags(SF)
 
-/*Pa2.1 Begin*/
 static inline void rtl_mv(rtlreg_t* dest, const rtlreg_t *src1) {
   // dest <- src1
-  *dest = *src1;
+  *dest=*src1;
 }
 
 static inline void rtl_not(rtlreg_t* dest) {
   // dest <- ~dest
-  *dest = ~(*dest);
+  *dest=~(*dest);
 }
-/*Pa2.1 End*/
-/*对于8位到32位的符号扩展：最高位是1则扩展后高位全为1，否则则高位全为0
-如果8位数是0x7f(01111111)，扩展后是0x0000007f
-如果8位数是0x81(10000001)，扩展后是0xffffff81
-*/
+
 static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   // dest <- signext(src1[(width * 8 - 1) .. 0])
-  // 根据源操作数的宽度进行符号扩展
-  
-  // // 首先获取源操作数的有效位
-  // *dest = *src1 & ((1u << (width * 8)) - 1);
-  
-  // // 如果最高位是1，需要进行符号扩展
-  // if (*dest & (1u << (width * 8 - 1))) {
-  //   // 将高位全部置为1
-  //   *dest |= (~0u) << (width * 8);
-  // }
   rtl_li(&t1,32-width*8);
   rtl_shl(dest,src1,&t1);
   rtl_sar(dest,dest,&t1);
@@ -158,43 +143,42 @@ static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
 
 static inline void rtl_push(const rtlreg_t* src1) {
   // esp <- esp - 4
+  rtl_subi(&cpu.esp,&cpu.esp,4);
   // M[esp] <- src1
-  /*Pa2.1 Begin*/
-  cpu.esp -= 4;//将栈指针esp减4（因为是32位系统，每个数据占4字节）
-  rtl_sm(&cpu.esp, 4, src1);//将src1指向的数据写入新的栈顶位置
-  /*Pa2.1 end*/
+  rtl_sm(&cpu.esp,4,src1);
 }
 
- //Pa2.1 0x5d pop %ebp指令。
 static inline void rtl_pop(rtlreg_t* dest) {
-  // dest <- M[esp]
+  // // dest <- M[esp]
+  rtl_lm(dest,&cpu.esp,4);
+  // // esp <- esp + 4
+  // rtl_addi(&cpu.esp,&cpu.esp,4);
   // esp <- esp + 4
-  rtl_lm(dest, &cpu.esp, 4);  // 从栈顶读取4字节数据
-  cpu.esp += 4;  // 栈指针加4
+  rtl_addi(&cpu.esp,&cpu.esp,4);
+  // // dest <- M[esp]
+  // rtl_lm(dest,&cpu.esp,4);
 }
-/*Pa2.1 Begin*/
 
-// 检查值是否为0，结果存入dest
 static inline void rtl_eq0(rtlreg_t* dest, const rtlreg_t* src1) {
-  *dest = (*src1 == 0) ? 1 : 0;
+  // dest <- (src1 == 0 ? 1 : 0)
+  *dest=*src1==0?1:0;
 }
 
-// 检查值是否等于立即数imm
 static inline void rtl_eqi(rtlreg_t* dest, const rtlreg_t* src1, int imm) {
-  *dest = (*src1 == imm) ? 1 : 0;
+  // dest <- (src1 == imm ? 1 : 0)
+  *dest=*src1==imm?1:0;
 }
 
-// 检查值是否不为0
 static inline void rtl_neq0(rtlreg_t* dest, const rtlreg_t* src1) {
-  *dest = (*src1 != 0) ? 1 : 0;
+  // dest <- (src1 != 0 ? 1 : 0)
+  *dest=*src1!=0?1:0;
 }
 
-// 获取src1指定宽度的最高位（符号位）
 static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
-  *dest = (*src1 >> (width * 8 - 1)) & 0x1;
+  // dest <- src1[width * 8 - 1]
+  rtl_shri(dest,src1,width*8-1);
 }
 
-// 根据运算结果更新ZF标志位
 static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
   // eflags.ZF <- is_zero(result[width * 8 - 1 .. 0])
   uint32_t mask=(~0u>>((4-width)<<3));
@@ -209,33 +193,10 @@ static inline void rtl_update_SF(const rtlreg_t* result, int width) {
   uint32_t msb=(*result>>msb_index)&1;
   cpu.eflags.SF=msb?1:0;
 }
-/*Pa2.1 End*/
 
-/*Pa2.1 Begin*/
 static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {
   rtl_update_ZF(result, width);
   rtl_update_SF(result, width);
 }
 
-
-// // CF (Carry Flag): 表示无符号运算是否产生进位
-// static inline void rtl_set_CF(const rtlreg_t* src) {
-//   cpu.eflags.CF = *src;
-// }
-
-// // OF (Overflow Flag): 表示有符号运算是否溢出
-// static inline void rtl_set_OF(const rtlreg_t* src) {
-//   cpu.eflags.OF = *src;
-// }
-
-// // ZF (Zero Flag): 表示结果是否为0
-// static inline void rtl_set_ZF(const rtlreg_t* src) {
-//   cpu.eflags.ZF = *src;
-// }
-
-// // SF (Sign Flag): 表示结果是否为负数
-// static inline void rtl_set_SF(const rtlreg_t* src) {
-//   cpu.eflags.SF = *src;
-// }
-/*Pa2.1 End*/
 #endif
