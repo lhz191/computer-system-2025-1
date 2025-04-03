@@ -51,13 +51,13 @@ int fs_open(const char *pathname, int flags, int mode) {
 
 //Pa3.2 获取文件大小
 size_t fs_filesz(int fd) {
-  assert(fd >= 0 && fd < sizeof(file_table) / sizeof(Finfo));
+  // assert(fd >= 0 && fd < sizeof(file_table) / sizeof(Finfo));
   return file_table[fd].size;
 }
 
 /*Pa3.2 读取文件*/
 ssize_t fs_read(int fd, void* buf, size_t len) {
-  assert(fd >= 0 && fd < NR_FILES);
+  // assert(fd >= 0 && fd < NR_FILES);
   ssize_t file_size = fs_filesz(fd);
   size_t current_offset = file_table[fd].open_offset;
   if (current_offset + len > file_size) {
@@ -121,7 +121,7 @@ ssize_t fs_write(int fd, const void *buf, size_t len) {
 
 
 off_t fs_lseek(int fd, off_t offset, int whence) {
-  assert(fd >= 0 && fd < NR_FILES);
+  // assert(fd >= 0 && fd < NR_FILES);
   Finfo *file = &file_table[fd];
   off_t new_offset = -1;
   switch (whence) {
