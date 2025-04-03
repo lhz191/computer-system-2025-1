@@ -42,8 +42,6 @@ void *_sbrk(intptr_t increment) {
   uintptr_t old_break = program_break;// 保存旧的program break
   uintptr_t new_break = program_break + increment;
   int ret = _syscall_(SYS_brk, new_break, 0, 0);// 调用SYS_brk系统调用设置新的program break
-  Log("[DEBUG] _sbrk called: increment=%d, old_break=0x%lx, new_break=0x%lx, ret=%d", 
-      increment, old_break, new_break, ret);
   if (ret == 0) {
     program_break = new_break;// 更新记录的program break
     return (void *)old_break;// 返回旧的program break位置
