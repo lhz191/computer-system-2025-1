@@ -74,7 +74,7 @@ ssize_t fs_read(int fd, void* buf, size_t len) {
       break;
     case FD_DISPINFO:
       // 读取显示设备信息
-      len = dispinfo_read(buf, current_offset, len);
+      dispinfo_read(buf, current_offset, len);
       file_table[fd].open_offset += len;
       break;
     default:
@@ -86,8 +86,6 @@ ssize_t fs_read(int fd, void* buf, size_t len) {
       }
       break;
   }
-Log("fs_read: fd=%d, file='%s', requested=%zu, read=%zu, offset=%zu/%zu", 
-      fd, filename, orig_len, len, file_table[fd].open_offset, file_size);
   return len;
 }
 
