@@ -146,6 +146,7 @@ off_t fs_lseek(int fd, off_t offset, int whence) {
       panic("fs_lseek: invalid whence (%d)", whence);
       assert(0);
   }
+  Log("seek success!");
   return new_offset;
 }
 
