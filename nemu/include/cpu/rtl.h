@@ -196,26 +196,27 @@ static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
 
 // 根据运算结果更新ZF标志位
 static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
-  rtl_eq0(&t0, result);
-  rtl_set_ZF(&t0);
+  // eflags.ZF <- is_zero(result[width * 8 - 1 .. 0])
+  uint32_t mask=(~0u>>((4-width)<<3));
+  uint32_t value=(*result&mask);
+  rtl_eq0(&value,&value);
+  rtl_set_ZF(&value);
 }
 
-// 根据运算结果更新SF标志位
 static inline void rtl_update_SF(const rtlreg_t* result, int width) {
-  rtl_msb(&t0, result, width);
-  rtl_set_SF(&t0);
+  // eflags.SF <- is_sign(result[width * 8 - 1 .. 0])
+  int msb_index=(width*8)-1;
+  uint32_t msb=(*result>>msb_index)&1;
+  cpu.eflags.SF=msb?1:0;
 }
 /*Pa2.1 End*/
 
 /*Pa2.1 Begin*/
 static inline void rtl_update_ZFSF(const rtlreg_t* result, int width) {
-  // 更新ZF
-  rtl_eq0(&t0, result);
-  rtl_set_ZF(&t0);
-  // 更新SF (检查最高位)
-  rtl_msb(&t0, result, width);
-  rtl_set_SF(&t0);
+  rtl_update_ZF(result, width);
+  rtl_update_SF(result, width);
 }
+
 
 // // CF (Carry Flag): 表示无符号运算是否产生进位
 // static inline void rtl_set_CF(const rtlreg_t* src) {
