@@ -120,35 +120,34 @@ ssize_t fs_write(int fd, const void *buf, size_t len) {
 }
 
 
-off_t fs_lseek(int fd, off_t offset, int whence){
-  off_t ret = -1;
-  switch(whence){
-    case SEEK_SET:{
-      if(offset>=0 && offset<=file_table[fd].size){
-        file_table[fd].open_offset = offset;
-        ret = file_table[fd].open_offset;
-      }
-      break;
+off_t fs_lseek(int fd, off_t offset, int whence) {
+  assert(fd >= 0 && fd < NR_FILES);
+  Finfo *file = &file_table[fd];
+  off_t new_offset = -1;
+  switch (whence) {
+    case SEEK_SET: // 从文件开头计算
+    if(offset>=0 && offset<=fs_filesz(fd)){
+      file->open_offset = offset;
+      new_offset = offset;
     }
-    case SEEK_CUR:{
-      if(offset+file_table[fd].open_offset>=0 && offset+file_table[fd].open_offset<=file_table[fd].size){
-        file_table[fd].open_offset += offset;
-        ret = file_table[fd].open_offset;
-      }
-      break;
+    break;
+    case SEEK_CUR: // 从当前位置计算
+    if(offset+file->open_offset>=0 && offset+file->open_offset<=fs_filesz(fd)){
+      file->open_offset += offset;
+      new_offset = offset;
     }
-    case SEEK_END:{
-      file_table[fd].open_offset = file_table[fd].size + offset;
-      ret = file_table[fd].open_offset;
+    break;
+    case SEEK_END: // 从文件末尾计算
+      file->open_offset = fs_filesz(fd) + offset;
+      new_offset = fs_filesz(fd) + offset;
       break;
-    }
-    default:{
-      Log("undefined whence..");
+    default:
+      // 无效的whence参数
+      panic("fs_lseek: invalid whence (%d)", whence);
       assert(0);
-    }
   }
-  Log("seek");
-  return ret;
+  Log("seek success!");
+  return new_offset;
 }
 
 int fs_close(int fd) {
