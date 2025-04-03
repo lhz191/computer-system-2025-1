@@ -1,10 +1,10 @@
 #include "common.h"
 #include "syscall.h"
-// int fs_open(const char *pathname, int flags, int mode);
-// ssize_t fs_read(int fd, void *buf, size_t len);
+int fs_open(const char *pathname, int flags, int mode);
+ssize_t fs_read(int fd, void *buf, size_t len);
 ssize_t fs_write(int fd, const void *buf, size_t len);
-// off_t fs_lseek(int fd, off_t offset, int whence);
-// int fs_close(int fd);
+off_t fs_lseek(int fd, off_t offset, int whence);
+int fs_close(int fd);
 
 // 为了强制单字符输出，sys_brk总是返回失败
 static int sys_brk(uintptr_t addr) {
@@ -33,7 +33,6 @@ _RegSet* do_syscall(_RegSet *r) {
       int fd = SYSCALL_ARG2(r);  // 获取文件描述符
       const char *buf = (const char *)SYSCALL_ARG3(r);  // 获取缓冲区地址
       size_t len = SYSCALL_ARG4(r);  // 获取写入长度
-
       // if (fd == 1 || fd == 2) {  // 如果是 stdout 或 stderr
       //   for (size_t i = 0; i < len; i++) {
       //     _putc(buf[i]);  // 使用 _putc 输出字符
@@ -47,10 +46,41 @@ _RegSet* do_syscall(_RegSet *r) {
       break;
     }
     case SYS_brk: {
-      // 获取新的program break地址
       uintptr_t addr = SYSCALL_ARG2(r);
-      // 调用sys_brk处理
       SYSCALL_ARG1(r) = sys_brk(addr);
+      break;
+    }
+    case SYS_open: {
+      const char *pathname = (const char *)SYSCALL_ARG2(r);
+      int flags = SYSCALL_ARG3(r);
+      int mode = SYSCALL_ARG4(r);
+      
+      Log("syscall: open('%s', %d, %d)", pathname, flags, mode);
+      SYSCALL_ARG1(r) = fs_open(pathname, flags, mode);
+      break;
+    }
+    case SYS_read: {
+      int fd = SYSCALL_ARG2(r);
+      void *buf = (void *)SYSCALL_ARG3(r);
+      size_t count = SYSCALL_ARG4(r);
+      
+      SYSCALL_ARG1(r) = fs_read(fd, buf, count);
+      break;
+    }
+    case SYS_lseek: {
+      int fd = SYSCALL_ARG2(r);
+      off_t offset = SYSCALL_ARG3(r);
+      int whence = SYSCALL_ARG4(r);
+      
+      Log("syscall: lseek(%d, %d, %d)", fd, offset, whence);
+      SYSCALL_ARG1(r) = fs_lseek(fd, offset, whence);
+      break;
+    }
+    case SYS_close: {
+      int fd = SYSCALL_ARG2(r);
+      
+      Log("syscall: close(%d)", fd);
+      SYSCALL_ARG1(r) = fs_close(fd);
       break;
     }
     default: panic("Unhandled syscall ID = %d", a[0]);
