@@ -32,7 +32,9 @@ int main() {
 
   // uint32_t entry = loader(NULL, "/bin/text");
   // /bin/bmptest
-  uint32_t entry = loader(NULL, "/bin/bmptest");
+  // uint32_t entry = loader(NULL, "/bin/bmptest");
+  // /bin/events
+  uint32_t entry = loader(NULL, "/bin/events");
 
   ((void (*)(void))entry)();
 
