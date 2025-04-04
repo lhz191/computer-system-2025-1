@@ -9,26 +9,23 @@ static const char *keyname[256] __attribute__((used)) = {
 };
 
 size_t events_read(void *buf, size_t len) {
-  // 优先处理按键事件
   int key = _read_key();
-  bool down = false;
-  if (key & 0x8000) {
-    // 最高位为1表示按键松开
+  bool is_down = false;
+  if(key & 0x8000 ) {
     key ^= 0x8000;
-    down = false;
-  } else if (key != _KEY_NONE) {
-    down = true;
+    is_down = true;
   }
-  if (key != _KEY_NONE) {
-    // 有按键事件，格式化为"k[d/u] KEY_NAME\n"
-    snprintf(buf, len, "k%c %s\n", down ? 'd' : 'u', keyname[key]);
-    return strlen(buf);  // 避免sprintf返回值计算\0的bug
+  if(key == _KEY_NONE) {
+    uint32_t ut = _uptime();
+    sprintf(buf, "t %d\n", ut);
+  } 
+  else {
+    sprintf(buf, "%s %s\n", is_down ? "kd" : "ku", keyname[key]);
   }
-  // 没有按键事件，返回时钟事件
-  uint32_t time_ms = _uptime();
-  snprintf(buf, len, "t %d\n", time_ms);
-  return strlen(buf);  // 避免sprintf返回值计算\0的bug
+  
+  return strlen(buf);
 }
+
 
 static char dispinfo[128] __attribute__((used));
 
