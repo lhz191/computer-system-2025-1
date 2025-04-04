@@ -15,7 +15,17 @@ size_t events_read(void *buf, size_t len) {
 static char dispinfo[128] __attribute__((used));
 
 void dispinfo_read(void *buf, off_t offset, size_t len) {
+  // 确保不会读取超过dispinfo字符串长度
+  // int disp_len = strlen(dispinfo);
+  // if (offset >= disp_len) {
+  //   len = 0;
+  // } else if (offset + len > disp_len) {
+  //   len = disp_len - offset;
+  // }
+  // 将dispinfo中的数据从offset位置拷贝len字节到buf
+  memcpy(buf, dispinfo + offset, len);
 }
+
 
 void fb_write(const void *buf, off_t offset, size_t len) {
   int row = (offset/4) / _screen.width;// 计算行号：将偏移量转换为像素行
@@ -31,6 +41,8 @@ void fb_write(const void *buf, off_t offset, size_t len) {
 void init_device() {
   _ioe_init();
 
-  // TODO: print the string to array `dispinfo` with the format
-  // described in the Navy-apps convention
+  // 获取屏幕尺寸并格式化信息到dispinfo
+  sprintf(dispinfo, "WIDTH:%d\nHEIGHT:%d\n", _screen.width, _screen.height);
+  
+  Log("Screen size: %d x %d", _screen.width, _screen.height);
 }
