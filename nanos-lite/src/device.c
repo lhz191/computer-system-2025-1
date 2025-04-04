@@ -21,8 +21,7 @@ size_t events_read(void *buf, size_t len) {
   }
   if (key != _KEY_NONE) {
     // 有按键事件，格式化为"k[d/u] KEY_NAME\n"
-    snprintf(buf, len, "k%c %s\n", 
-                              down ? 'd' : 'u', keyname[key]);
+    snprintf(buf, len, "k%c %s\n", down ? 'd' : 'u', keyname[key]);
     return strlen(buf);  // 避免sprintf返回值计算\0的bug
   }
   // 没有按键事件，返回时钟事件
