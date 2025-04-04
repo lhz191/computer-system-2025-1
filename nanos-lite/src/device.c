@@ -10,19 +10,18 @@ static const char *keyname[256] __attribute__((used)) = {
 
 size_t events_read(void *buf, size_t len) {
   int key = _read_key();
-  bool is_down = false;
+  bool down = false;
   if(key & 0x8000 ) {
     key ^= 0x8000;
-    is_down = true;
+    down = true;
   }
   if(key == _KEY_NONE) {
     uint32_t ut = _uptime();
     sprintf(buf, "t %d\n", ut);
   } 
   else {
-    sprintf(buf, "%s %s\n", is_down ? "kd" : "ku", keyname[key]);
+    sprintf(buf, "%s %s\n", down ? "kd" : "ku", keyname[key]);
   }
-  
   return strlen(buf);
 }
 
