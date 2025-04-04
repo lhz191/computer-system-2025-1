@@ -35,20 +35,24 @@ extern char _end;
 //记录当前program break的位置
 static uintptr_t program_break = 0;
 
-void *_sbrk(intptr_t increment) {
-  if (program_break == 0) {// 第一次调用我们需要初始化program break
-    program_break = (uintptr_t)&_end;
-  }
-  uintptr_t old_break = program_break;// 保存旧的program break
-  uintptr_t new_break = program_break + increment;
-  int ret = _syscall_(SYS_brk, new_break, 0, 0);// 调用SYS_brk系统调用设置新的program break
-  if (ret == 0) {
-    program_break = new_break;// 更新记录的program break
-    return (void *)old_break;// 返回旧的program break位置
-  } else {
-    return (void *)-1;// 系统调用失败，返回-1
-  }
-}
+   void *_sbrk(intptr_t increment) {
+     if (program_break == 0) {
+       // 初始化为更高的地址，避免使用过低的地址
+       program_break = (uintptr_t)&_end;
+       if (program_break < 0x100000) {  // 确保至少从1MB开始
+         program_break = 0x100000;
+       }
+     }
+     uintptr_t old_break = program_break;
+     uintptr_t new_break = program_break + increment;
+     int ret = _syscall_(SYS_brk, new_break, 0, 0);
+     if (ret == 0) {
+       program_break = new_break;
+       return (void *)old_break;
+     } else {
+       return (void *)-1;
+     }
+   }
 
 /*Pa3.2 read系统调用*/
 int _read(int fd, void *buf, size_t count) {
