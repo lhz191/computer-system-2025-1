@@ -39,6 +39,7 @@ void init_fs() {
 int fs_open(const char *pathname, int flags, int mode) {
   for (int i = 0; i < sizeof(file_table) / sizeof(Finfo); i++) {
     if (strcmp(file_table[i].name, pathname) == 0) {
+      file_table[i].open_offset = 0;  // 重置文件指针位置
       return i;  // 返回文件描述符（即文件记录表索引）
     }
   }
@@ -59,9 +60,17 @@ ssize_t fs_read(int fd, void* buf, size_t len) {
   assert(fd >= 0 && fd < NR_FILES);
   ssize_t file_size = fs_filesz(fd);
   size_t current_offset = file_table[fd].open_offset;
-  if (current_offset + len > file_size) {
+  
+  // 如果已经到达文件尾，直接返回0
+  if (current_offset >= file_size && fd != FD_EVENTS) {
+    return 0;
+  }
+  
+  // 调整读取长度，确保不会越界
+  if (current_offset + len > file_size && fd != FD_EVENTS) {
     len = file_size - current_offset;
   }
+  
   switch (fd) {
     case FD_STDIN:
     case FD_STDOUT:
@@ -92,6 +101,9 @@ ssize_t fs_read(int fd, void* buf, size_t len) {
 
 //Pa3.2 写入文件
 ssize_t fs_write(int fd, const void *buf, size_t len) {
+  // 检查文件描述符是否有效
+  assert(fd >= 0 && fd < NR_FILES);
+  
   Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
   //1.stdout：将数据输出到串口或控制台。
   //2.stderr：用于标准错误输出。
@@ -104,16 +116,32 @@ ssize_t fs_write(int fd, const void *buf, size_t len) {
   }
   else if(fd == FD_FB)
   {
-    fb_write(buf,file_table[fd].open_offset,len);
-    file_table[fd].open_offset+=len;
+    // 确保写入不会超出帧缓冲区大小
+    if (file_table[fd].open_offset >= file_table[fd].size) {
+      return 0; // 已经到达缓冲区尾部
+    }
+    
+    if (file_table[fd].open_offset + len > file_table[fd].size) {
+      len = file_table[fd].size - file_table[fd].open_offset;
+    }
+    
+    fb_write(buf, file_table[fd].open_offset, len);
+    file_table[fd].open_offset += len;
     return len;
   }
   // 其他文件的写入操作
   Finfo *f = &file_table[fd];
+  
+  // 检查是否到达文件尾
+  if (f->open_offset >= f->size) {
+    return 0;
+  }
+  
   if (f->open_offset + len > f->size) {
     len = f->size - f->open_offset;  // 调整写入长度
   }
-  ramdisk_write(buf,f->disk_offset + f->open_offset, len);
+  
+  ramdisk_write(buf, f->disk_offset + f->open_offset, len);
   f->open_offset += len;  // 更新偏移量
   return len;
 }
@@ -123,28 +151,32 @@ off_t fs_lseek(int fd, off_t offset, int whence) {
   assert(fd >= 0 && fd < NR_FILES);
   Finfo *file = &file_table[fd];
   off_t new_offset = -1;
+  
   switch (whence) {
     case SEEK_SET: // 从文件开头计算
-    if(offset>=0 && offset<=fs_filesz(fd)){
-      file->open_offset = offset;
-      new_offset = offset;
-    }
-    break;
+      if (offset >= 0 && offset <= fs_filesz(fd)) {
+        file->open_offset = offset;
+        new_offset = file->open_offset;
+      }
+      break;
     case SEEK_CUR: // 从当前位置计算
-    if(offset+file->open_offset>=0 && offset+file->open_offset<=fs_filesz(fd)){
-      file->open_offset += offset;
-      new_offset = offset;
-    }
-    break;
+      if (file->open_offset + offset >= 0 && file->open_offset + offset <= fs_filesz(fd)) {
+        file->open_offset += offset;
+        new_offset = file->open_offset; // 修正：返回新的绝对位置而不是偏移量
+      }
+      break;
     case SEEK_END: // 从文件末尾计算
-      file->open_offset = fs_filesz(fd) + offset;
-      new_offset = fs_filesz(fd) + offset;
+      if (offset <= 0 && fs_filesz(fd) + offset >= 0) { // 通常从末尾是负偏移
+        file->open_offset = fs_filesz(fd) + offset;
+        new_offset = file->open_offset;
+      }
       break;
     default:
       // 无效的whence参数
       panic("fs_lseek: invalid whence (%d)", whence);
       assert(0);
   }
+  
   return new_offset;
 }
 
