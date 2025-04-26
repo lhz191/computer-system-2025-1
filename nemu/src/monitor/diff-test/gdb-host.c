@@ -7,16 +7,10 @@ static struct gdb_conn *conn;
 
 bool gdb_connect_qemu(void) {
   // connect to gdbserver on localhost port 1234
-  int retry_count = 0;
   while ((conn = gdb_begin_inet("127.0.0.1", 1234)) == NULL) {
-    usleep(1000);  // 增加等待时间到1ms
-    retry_count++;
-    if (retry_count > 5000) {  // 增加最大重试次数限制
-      printf("Failed to connect to QEMU after %d attempts\n", retry_count);
-      return false;  // 超时后返回失败
-    }
+    usleep(1);
   }
-  printf("Successfully connected to QEMU after %d attempts\n", retry_count);
+
   return true;
 }
 
