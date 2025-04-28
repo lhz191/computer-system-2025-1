@@ -198,8 +198,12 @@ static inline void rtl_msb(rtlreg_t* dest, const rtlreg_t* src1, int width) {
 
 // 根据运算结果更新ZF标志位
 static inline void rtl_update_ZF(const rtlreg_t* result, int width) {
-  rtl_eq0(&t0, result);
-  rtl_set_ZF(&t0);
+  // eflags.ZF <- is_zero(result[width * 8 - 1 .. 0])
+  //TODO();
+  //rtlreg_t mask =1ULL << (width *8 -1);
+  //cpu.ZF = ((*result & mask)==0)?1:0;
+  cpu.eflags.ZF = ((~0u>>(32-width*8))&*result)==0;
+  //printf("zf:%d\n",cpu.ZF);
 }
 
 // 根据运算结果更新SF标志位
