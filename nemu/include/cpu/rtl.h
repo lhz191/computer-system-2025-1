@@ -161,7 +161,7 @@ static inline void rtl_push(const rtlreg_t* src1) {
   // M[esp] <- src1
   /*Pa2.1 Begin*/
   cpu.esp -= 4;//将栈指针esp减4（因为是32位系统，每个数据占4字节）
-  rtl_sm(&cpu.esp, 4, src1);//将src1指向的数据写入新的栈顶位置
+  vaddr_write(cpu.esp, 4, *src1);
   /*Pa2.1 end*/
 }
 
