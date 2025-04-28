@@ -161,7 +161,7 @@ static inline void rtl_push(const rtlreg_t* src1) {
   // M[esp] <- src1
   /*Pa2.1 Begin*/
   cpu.esp -= 4;//将栈指针esp减4（因为是32位系统，每个数据占4字节）
-  vaddr_write(cpu.esp, 4, *src1);
+  rtl_sm(&cpu.esp, 4, src1);//将src1指向的数据写入新的栈顶位置
   /*Pa2.1 end*/
 }
 
@@ -169,7 +169,7 @@ static inline void rtl_push(const rtlreg_t* src1) {
 static inline void rtl_pop(rtlreg_t* dest) {
   // dest <- M[esp]
   // esp <- esp + 4
-  rtl_lm(dest, &cpu.esp, 4);  // 从栈顶读取4字节数据
+  *dest = vaddr_read(cpu.esp, 4);
   cpu.esp += 4;  // 栈指针加4
 }
 /*Pa2.1 Begin*/
