@@ -28,16 +28,22 @@ size_t events_read(void *buf, size_t len) {
 
 static char dispinfo[128] __attribute__((used));
 
-void dispinfo_read(void *buf, off_t offset, size_t len) {
-  // 确保不会读取超过dispinfo字符串长度
-  // int disp_len = strlen(dispinfo);
-  // if (offset >= disp_len) {
-  //   len = 0;
-  // } else if (offset + len > disp_len) {
-  //   len = disp_len - offset;
-  // }
-  // 将dispinfo中的数据从offset位置拷贝len字节到buf
-  memcpy(buf, dispinfo + offset, len);
+// void dispinfo_read(void *buf, off_t offset, size_t len) {
+//   // 确保不会读取超过dispinfo字符串长度
+//   // int disp_len = strlen(dispinfo);
+//   // if (offset >= disp_len) {
+//   //   len = 0;
+//   // } else if (offset + len > disp_len) {
+//   //   len = disp_len - offset;
+//   // }
+//   // 将dispinfo中的数据从offset位置拷贝len字节到buf
+//   memcpy(buf, dispinfo + offset, len);
+// }
+
+ssize_t dispinfo_read(void *buf, off_t offset, size_t len) {
+
+  memcpy(buf,dispinfo + offset,len);
+  return len;
 }
 
 
