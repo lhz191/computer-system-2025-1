@@ -151,9 +151,11 @@ static inline void rtl_sext(rtlreg_t* dest, const rtlreg_t* src1, int width) {
   //   // 将高位全部置为1
   //   *dest |= (~0u) << (width * 8);
   // }
-  rtl_li(&t1,32-width*8);
-  rtl_shl(dest,src1,&t1);
-  rtl_sar(dest,dest,&t1);
+  // rtl_li(&t1,32-width*8);
+  // rtl_shl(dest,src1,&t1);
+  // rtl_sar(dest,dest,&t1);
+  int shift = (8*(4-width));
+  *dest = ((int32_t)(*src1<<shift))>>shift;
 }
 
 static inline void rtl_push(const rtlreg_t* src1) {
@@ -169,7 +171,7 @@ static inline void rtl_push(const rtlreg_t* src1) {
 static inline void rtl_pop(rtlreg_t* dest) {
   // dest <- M[esp]
   // esp <- esp + 4
-  *dest = vaddr_read(cpu.esp, 4);
+  rtl_lm(dest, &cpu.esp, 4);  // 从栈顶读取4字节数据
   cpu.esp += 4;  // 栈指针加4
 }
 /*Pa2.1 Begin*/
