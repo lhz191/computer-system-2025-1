@@ -42,7 +42,6 @@ _RegSet* do_syscall(_RegSet *r) {
       Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
 
       SYSCALL_ARG1(r) = fs_write(fd,buf,len);
-      return NULL;
       break;
     }
     case SYS_brk: {
