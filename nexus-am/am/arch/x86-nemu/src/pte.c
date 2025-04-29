@@ -1,11 +1,12 @@
 #include <x86.h>
 
-#define PG_ALIGN __attribute((aligned(PGSIZE)))
+#define PG_ALIGN __attribute((aligned(PGSIZE)))//页
 
-static PDE kpdirs[NR_PDE] PG_ALIGN;
-static PTE kptabs[PMEM_SIZE / PGSIZE] PG_ALIGN;
-static void* (*palloc_f)();
-static void (*pfree_f)(void*);
+static PDE kpdirs[NR_PDE] PG_ALIGN;//kpdirs页目录
+static PTE kptabs[PMEM_SIZE / PGSIZE] PG_ALIGN;//kptabs页表数组，1个页目录表对应1个页表数组
+//PMEM_SIZE是1个页目录项对应的页表数组的大小，PMEM_SIZE / PGSIZE是页的数量
+static void* (*palloc_f)();//分配页
+static void (*pfree_f)(void*);//释放页
 
 _Area segments[] = {      // Kernel memory mappings
   {.start = (void*)0,          .end = (void*)PMEM_SIZE}
@@ -29,10 +30,10 @@ void _pte_init(void* (*palloc)(), void (*pfree)(void*)) {
     uint32_t pdir_idx = (uintptr_t)segments[i].start / (PGSIZE * NR_PTE);
     uint32_t pdir_idx_end = (uintptr_t)segments[i].end / (PGSIZE * NR_PTE);
     for (; pdir_idx < pdir_idx_end; pdir_idx ++) {
-      // fill PDE
+      // fill PDE页目录项
       kpdirs[pdir_idx] = (uintptr_t)ptab | PTE_P;
 
-      // fill PTE
+      // fill PTE页表项
       PTE pte = PGADDR(pdir_idx, 0, 0) | PTE_P;
       PTE pte_end = PGADDR(pdir_idx + 1, 0, 0) | PTE_P;
       for (; pte < pte_end; pte += PGSIZE) {
