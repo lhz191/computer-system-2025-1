@@ -43,8 +43,60 @@ uint32_t paddr_read(paddr_t addr, int len) {
      memcpy(guest_to_host(addr), &data, len);
    }
 
+/* 页表地址转换函数实现 */
+paddr_t page_translate(vaddr_t addr) {
+  /* 当CR0的PG位为0时，不启用分页机制 */
+  if (!(cpu.cr0.paging)) {
+    return addr;
+  }
+
+  /* 将32位虚拟地址分解为：
+   * 高10位 - 页目录索引 (Directory)
+   * 中10位 - 页表索引 (Page)
+   * 低12位 - 页内偏移 (Offset)
+   */
+  uint32_t dir = (addr >> 22) & 0x3FF;  // 页目录索引（高10位）
+  uint32_t page = (addr >> 12) & 0x3FF; // 页表索引（中10位）
+  uint32_t offset = addr & 0xFFF;       // 页内偏移（低12位）
+
+  /* 从CR3获取页目录基址 */
+  uint32_t page_directory_base = cpu.cr3.page_directory_base << 12;
+  
+  /* 获取页目录项 */
+  PDE pde;
+  pde.val = paddr_read(page_directory_base + dir * 4, 4);
+  
+  /* 检查页目录项的present位 */
+  Assert(pde.present, "Page Directory Entry not present! Virtual address = 0x%x", addr);
+  
+  /* 设置页目录项的accessed位 */
+  if (!pde.accessed) {
+    pde.accessed = 1;
+    paddr_write(page_directory_base + dir * 4, 4, pde.val);
+  }
+  
+  /* 获取页表基址 */
+  uint32_t page_table_base = pde.page_frame << 12;
+  
+  /* 获取页表项 */
+  PTE pte;
+  pte.val = paddr_read(page_table_base + page * 4, 4);
+  
+  /* 检查页表项的present位 */
+  Assert(pte.present, "Page Table Entry not present! Virtual address = 0x%x", addr);
+  
+  /* 设置页表项的accessed位 */
+  if (!pte.accessed) {
+    pte.accessed = 1;
+    paddr_write(page_table_base + page * 4, 4, pte.val);
+  }
+
+  /* 返回物理地址 = 页框基址 + 偏移量 */
+  return (pte.page_frame << 12) | offset;
+}
+
 /* 声明页表地址转换函数 */
-paddr_t page_translate(vaddr_t addr);
+// paddr_t page_translate(vaddr_t addr);
 
 uint32_t vaddr_read(vaddr_t addr, int len) {
   if (cpu.cr0.paging) {
