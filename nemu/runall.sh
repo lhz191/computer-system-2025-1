@@ -31,7 +31,7 @@ for file in $files; do
     rm $logfile
   else
     echo -e "\033[1;31mFAIL!\033[0m see $logfile for more information"
-    if (test -e $ori_log) then
+    if (test -e $ori_log)   
       echo -e "\n\n===== the original log.txt =====\n" >> $logfile
       cat $ori_log >> $logfile
     fi
