@@ -67,6 +67,36 @@ void _switch(_Protect *p) {
 }
 
 void _map(_Protect *p, void *va, void *pa) {
+  // Pa4.1: 实现虚拟地址到物理地址的映射
+  PDE *pgdir = (PDE*)p->ptr;  // 获取页目录基址
+  
+  // 计算页目录索引和页表索引
+  uint32_t pde_idx = PDX(va);  // 取虚拟地址的高10位作为页目录索引
+  uint32_t pte_idx = PTX(va);  // 取虚拟地址的中10位作为页表索引
+  
+  // 检查页目录项是否存在，不存在则创建一个新的页表
+  if (!(pgdir[pde_idx] & PTE_P)) {
+    // 申请一个新页用作页表
+    PTE *ptab = (PTE*)palloc_f();
+    if (ptab == NULL) {
+      // 内存分配失败处理
+      panic("Failed to allocate memory for page table");
+    }
+    
+    // 初始化页表，将所有页表项设为无效
+    for (int i = 0; i < NR_PTE; i++) {
+      ptab[i] = 0;
+    }
+    
+    // 更新页目录项，指向新的页表，并设置存在位和读写位
+    pgdir[pde_idx] = (uint32_t)ptab | PTE_P | PTE_W | PTE_U;
+  }
+  
+  // 获取页表地址 - 使用PTE_ADDR宏来提取地址部分
+  PTE *ptab = (PTE*)PTE_ADDR(pgdir[pde_idx]);
+  
+  // 更新页表项，建立va到pa的映射
+  ptab[pte_idx] = (uint32_t)pa | PTE_P | PTE_W | PTE_U;
 }
 
 void _unmap(_Protect *p, void *va) {
