@@ -8,6 +8,12 @@ size_t get_ramdisk_size();
 void ramdisk_read(void *buf, off_t offset, size_t len);
 void* new_page(void);
 
+// Pa4.1: 增加文件系统函数声明
+int fs_open(const char *pathname, int flags, int mode);
+size_t fs_filesz(int fd);
+ssize_t fs_read(int fd, void *buf, size_t len);
+int fs_close(int fd);
+
 uintptr_t loader(_Protect *as, const char *filename) {
   // size_t size = get_ramdisk_size();
   // ramdisk_read(DEFAULT_ENTRY, 0, size);
@@ -32,7 +38,7 @@ uintptr_t loader(_Protect *as, const char *filename) {
     pa = new_page();
     
     // 2. 把这一物理页映射到用户程序的虚拟地址空间中
-    _map(as, va, pa, 0);
+    _map(as, va, pa);  // Pa4.1: 修正_map参数，去掉不需要的权限参数
     
     // 3. 从文件中读入一页或剩余内容到这一物理页上
     size_t bytes_to_read = (i == pages - 1) ? (size - i * PGSIZE) : PGSIZE;
