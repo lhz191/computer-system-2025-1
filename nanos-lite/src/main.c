@@ -9,6 +9,7 @@ void init_ramdisk(void);
 void init_device(void);
 void init_irq(void);
 void init_fs(void);
+void load_prog(const char *filename);
 uint32_t loader(_Protect *, const char *);
 
 int main() {
@@ -36,8 +37,9 @@ int main() {
   // /bin/events
   // uint32_t entry = loader(NULL, "/bin/events");
 //   // /bin/pal
-uint32_t entry = loader(NULL, "/bin/pal");
-  ((void (*)(void))entry)();
+// uint32_t entry = loader(NULL, "/bin/pal");
+//   ((void (*)(void))entry)();
+  load_prog("/bin/dummy");  // Pa4.1: 使用load_prog加载用户程序到独立的虚拟地址空间
 
   panic("Should not reach here");
 }
