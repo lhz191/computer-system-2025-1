@@ -104,8 +104,16 @@ uint32_t vaddr_read(vaddr_t addr, int len) {
     vaddr_t page_start = addr & ~PAGE_MASK;
     vaddr_t page_end = (addr + len - 1) & ~PAGE_MASK;
     if (page_start != page_end) {
-      /* 数据跨越页边界，暂不处理 */
-      assert(0);
+      /* 数据跨越页边界，需要分别读取两个页面 */
+      int first_len = PAGE_SIZE - (addr & PAGE_MASK);
+      int second_len = len - first_len;
+      
+      /* 分别读取两个页面的数据 */
+      uint32_t first_data = vaddr_read(addr, first_len);
+      uint32_t second_data = vaddr_read(addr + first_len, second_len);
+      
+      /* 拼接两个页面的数据 */
+      return (second_data << (first_len * 8)) | first_data;
     }
     
     /* 进行页表地址转换 */
@@ -122,8 +130,14 @@ void vaddr_write(vaddr_t addr, int len, uint32_t data) {
     vaddr_t page_start = addr & ~PAGE_MASK;
     vaddr_t page_end = (addr + len - 1) & ~PAGE_MASK;
     if (page_start != page_end) {
-      /* 数据跨越页边界，暂不处理 */
-      assert(0);
+      /* 数据跨越页边界，需要分别写入两个页面 */
+      int first_len = PAGE_SIZE - (addr & PAGE_MASK);
+      int second_len = len - first_len;
+      
+      /* 分别写入两个页面的数据 */
+      vaddr_write(addr, first_len, data & ((1 << (first_len * 8)) - 1));
+      vaddr_write(addr + first_len, second_len, data >> (first_len * 8));
+      return;
     }
     
     /* 进行页表地址转换 */
