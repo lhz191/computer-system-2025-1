@@ -78,10 +78,6 @@ void _map(_Protect *p, void *va, void *pa) {
   if (!(pgdir[pde_idx] & PTE_P)) {
     // 申请一个新页用作页表
     PTE *ptab = (PTE*)palloc_f();
-    if (ptab == NULL) {
-      // 内存分配失败处理
-      panic("Failed to allocate memory for page table");
-    }
     
     // 初始化页表，将所有页表项设为无效
     for (int i = 0; i < NR_PTE; i++) {
@@ -92,8 +88,8 @@ void _map(_Protect *p, void *va, void *pa) {
     pgdir[pde_idx] = (uint32_t)ptab | PTE_P | PTE_W | PTE_U;
   }
   
-  // 获取页表地址 - 使用PTE_ADDR宏来提取地址部分
-  PTE *ptab = (PTE*)PTE_ADDR(pgdir[pde_idx]);
+  // 获取页表地址
+  PTE *ptab = (PTE*)(pgdir[pde_idx] & ~0xFFF);  // 清除低12位标志位得到页表基址
   
   // 更新页表项，建立va到pa的映射
   ptab[pte_idx] = (uint32_t)pa | PTE_P | PTE_W | PTE_U;
