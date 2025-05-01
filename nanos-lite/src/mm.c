@@ -14,23 +14,17 @@ void free_page(void *p) {
   panic("not implement yet");
 }
 
-/* The brk() system call handler. */
 int mm_brk(uint32_t new_brk) {
   if (current->cur_brk == 0) {
     current->cur_brk = current->max_brk = new_brk;
   }
   else {
     if (new_brk > current->max_brk) {
-      // 计算需要映射的起始和结束地址（页对齐）
+      // 计算需要映射的起始和结束地址
       uint32_t first = PGROUNDUP(current->max_brk);
       uint32_t end = PGROUNDDOWN(new_brk);
       
-      // 如果new_brk刚好页对齐，需要特殊处理
-      if ((new_brk & 0xfff) == 0) {
-        end = PGSIZE;
-      }
-      
-      // 映射内存区域，一次一页
+      // 确保映射整个区域，包括页边界
       for (uint32_t va = first; va <= end; va += PGSIZE) {
         void* pa = new_page();
         _map(&(current->as), (void*)va, pa);
