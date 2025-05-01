@@ -1,10 +1,7 @@
 #include "nemu.h"
 #include "device/mmio.h"
-#include "memory/memory.h"
-#include "cpu/reg.h"
-#include "x86.h"
 
-#define PMEM_SIZE (128 * 1024 * 1024)
+#define PMEM_SIZE (256 * 1024 * 1024)
 
 #define pmem_rw(addr, type) *(type *)({\
     Assert(addr < PMEM_SIZE, "physical address(0x%08x) is out of bound", addr); \
@@ -31,89 +28,76 @@ uint32_t paddr_read(paddr_t addr, int len) {
 //   memcpy(guest_to_host(addr), &data, len);
 // }
 
-void paddr_write(paddr_t addr, int len, uint32_t data) {
-  int mmio_id = is_mmio(addr);
-  if (mmio_id != -1) {
-    mmio_write(addr,len,data,mmio_id);
-  }
-  memcpy(guest_to_host(addr), &data, len);
-}
+   void paddr_write(paddr_t addr, int len, uint32_t data) {
+     // 保护低地址区域
+     if (addr < 0x1000) {
+       Log("Warning: Attempt to write to low memory address 0x%x, ignored", addr);
+       return;  // 忽略对低地址的写入
+     }
+     
+     int mmio_id = is_mmio(addr);
+     if (mmio_id != -1) {
+       mmio_write(addr,len,data,mmio_id);
+       return;  // 已在mmio_write处理，不需要再写入主内存
+     }
+     memcpy(guest_to_host(addr), &data, len);
+   }
 
+/* 声明页表地址转换函数 */
+paddr_t page_translate(vaddr_t addr);
 
-
-
-/* PA4.1: 实现页地址转换函数 */
-paddr_t page_translate(vaddr_t addr) {
-  /* 检查是否启用分页机制 */
-  if (!(cpu.cr0 & CR0_PG)) {
-    return addr;  // 分页未开启，直接返回地址
-  }
-
-  /* 获取虚拟地址的各部分 */
-  uint32_t pdx = PDX(addr);  // 页目录索引
-  uint32_t ptx = PTX(addr);  // 页表索引
-  uint32_t off = OFF(addr);  // 页内偏移
-
-  /* 页目录基址从CR3寄存器获取 */
-  PDE *pgdir = (PDE *)(cpu.cr3 & ~0xfff);  // 去掉低12位，对齐页边界
-  PDE pde = paddr_read((paddr_t)&pgdir[pdx], 4);
-
-  /* 检查页目录项是否有效 */
-  Assert(pde & PTE_P, "page directory entry not present");
-
-  /* 获取页表项 */
-  PTE *pgtab = (PTE *)(PTE_ADDR(pde));  // 从页目录项获取页表基址
-  PTE pte = paddr_read((paddr_t)&pgtab[ptx], 4);
-
-  /* 检查页表项是否有效 */
-  Assert(pte & PTE_P, "page table entry not present");
-
-  /* 设置accessed位 */
-  if (!(pte & PTE_A)) {
-    pte |= PTE_A;
-    paddr_write((paddr_t)&pgtab[ptx], 4, pte);
-  }
-
-  /* 返回物理地址 */
-  return (PTE_ADDR(pte) | off);
-}
-
-//Pa4.1 vaddr_read函数
 uint32_t vaddr_read(vaddr_t addr, int len) {
-  if ((addr & ~0xfff) != ((addr + len - 1) & ~0xfff)) {
-    /* 数据跨页边界 */
-    assert(0);
-  }
-  else {
+  if (cpu.cr0.paging) {
+    /* 检查是否跨页访问 */
+    vaddr_t page_start = addr & ~PAGE_MASK;
+    vaddr_t page_end = (addr + len - 1) & ~PAGE_MASK;
+    if (page_start != page_end) {
+      /* 数据跨越页边界，暂不处理 */
+      assert(0);
+    }
+    
+    /* 进行页表地址转换 */
     paddr_t paddr = page_translate(addr);
     return paddr_read(paddr, len);
+  } else {
+    return paddr_read(addr, len);
   }
 }
 
-//Pa4.1 vaddr_write函数
 void vaddr_write(vaddr_t addr, int len, uint32_t data) {
-  if ((addr & ~0xfff) != ((addr + len - 1) & ~0xfff)) {
-    /* 数据跨页边界 */
-    assert(0);
-  }
-  else {
+  if (cpu.cr0.paging) {
+    /* 检查是否跨页访问 */
+    vaddr_t page_start = addr & ~PAGE_MASK;
+    vaddr_t page_end = (addr + len - 1) & ~PAGE_MASK;
+    if (page_start != page_end) {
+      /* 数据跨越页边界，暂不处理 */
+      assert(0);
+    }
+    
+    /* 进行页表地址转换 */
     paddr_t paddr = page_translate(addr);
     
-    /* 如果分页开启，设置dirty位 */
-    if (cpu.cr0 & CR0_PG) {
-      uint32_t pdx = PDX(addr);
-      uint32_t ptx = PTX(addr);
-      PDE *pgdir = (PDE *)(cpu.cr3 & ~0xfff);
-      PDE pde = paddr_read((paddr_t)&pgdir[pdx], 4);
-      PTE *pgtab = (PTE *)(PTE_ADDR(pde));
-      PTE pte = paddr_read((paddr_t)&pgtab[ptx], 4);
+    /* 设置脏位（只在写操作时） */
+    if (cpu.cr0.paging) {
+      uint32_t dir = (addr >> 22) & 0x3FF;
+      uint32_t page = (addr >> 12) & 0x3FF;
       
-      if (!(pte & PTE_D)) {
-        pte |= PTE_D;
-        paddr_write((paddr_t)&pgtab[ptx], 4, pte);
+      uint32_t page_directory_base = cpu.cr3.page_directory_base << 12;
+      PDE pde;
+      pde.val = paddr_read(page_directory_base + dir * 4, 4);
+      
+      uint32_t page_table_base = pde.page_frame << 12;
+      PTE pte;
+      pte.val = paddr_read(page_table_base + page * 4, 4);
+      
+      if (!pte.dirty) {
+        pte.dirty = 1;
+        paddr_write(page_table_base + page * 4, 4, pte.val);
       }
     }
     
     paddr_write(paddr, len, data);
+  } else {
+    paddr_write(addr, len, data);
   }
 }
