@@ -39,7 +39,7 @@ int main() {
 //   // /bin/pal
 // uint32_t entry = loader(NULL, "/bin/pal");
 //   ((void (*)(void))entry)();
-  load_prog("/bin/dummy");  // Pa4.1: 使用load_prog加载用户程序到独立的虚拟地址空间
+  load_prog("/bin/pal");  // Pa4.1: 使用load_prog加载用户程序到独立的虚拟地址空间
 
   panic("Should not reach here");
 }
