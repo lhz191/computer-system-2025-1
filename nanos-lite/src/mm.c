@@ -1,8 +1,6 @@
 #include "proc.h"
 #include "memory.h"
 
-#define K4(va) (((uint32_t)(va)+0xfff) & ~0xfff)
-
 static void *pf = NULL;
 
 void* new_page(void) {
@@ -15,7 +13,7 @@ void* new_page(void) {
 void free_page(void *p) {
   panic("not implement yet");
 }
-
+#define K4(va) (((uint32_t)(va)+0xfff) & ~0xfff)
 /* The brk() system call handler. */
 int mm_brk(uint32_t new_brk) {
     if(current->cur_brk==0)  current->cur_brk=current->max_brk=new_brk;
