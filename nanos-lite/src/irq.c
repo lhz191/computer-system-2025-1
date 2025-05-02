@@ -5,7 +5,9 @@ _RegSet* do_syscall(_RegSet *r);
 static _RegSet* do_event(_Event e, _RegSet* r) {
   switch (e.event) {
     case _EVENT_SYSCALL:
-      return do_syscall(r);
+      // 处理完系统调用后进行进程调度
+      do_syscall(r);
+      return schedule(r);
     case _EVENT_TRAP:
       printf("Received kernel trap, initiating context switch.\n");
       // Schedule will switch to the first user process

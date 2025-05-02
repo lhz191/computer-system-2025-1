@@ -1,10 +1,12 @@
-#include "proc.h"
+#include "../include/proc.h"
+#include "../include/fs.h"
 
 #define MAX_NR_PROC 4
 
 static PCB pcb[MAX_NR_PROC];
 static int nr_proc = 0;
 PCB *current = NULL;
+
 
 void load_prog(const char *filename) {
   int i = nr_proc ++;
@@ -30,13 +32,12 @@ _RegSet* schedule(_RegSet *prev) {
     current->tf = prev;
   }
   
-  // Always select the first process (only one user process for now)
-  if (nr_proc > 0) {
-    current = &pcb[0];
-    _switch(&current->as);
-    return current->tf;
-  }
+  // 简单的轮流调度：在仙剑奇侠传和hello程序之间切换
+  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
   
-  // No processes available
-  return NULL;
+  // 切换到新进程的地址空间
+  _switch(&current->as);
+  
+  // 返回新进程的陷阱帧
+  return current->tf;
 }
