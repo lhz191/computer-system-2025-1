@@ -48,8 +48,8 @@ _RegSet* do_syscall(_RegSet *r) {
     }
     case SYS_brk: {
       uintptr_t addr = SYSCALL_ARG2(r);
-      mm_brk(addr);  // 调用mm_brk但忽略其返回值
-      SYSCALL_ARG1(r) = 1;  // 直接返回1表示成功
+      int ret = mm_brk(addr);
+      SYSCALL_ARG1(r) = ret;
       break;
     }
     case SYS_open: {
