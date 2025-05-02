@@ -7,6 +7,10 @@ static PCB pcb[MAX_NR_PROC];
 static int nr_proc = 0;
 PCB *current = NULL;
 
+// 用于优先级调度的计数器
+static int count = 0;
+// 每PAL_PRIORITY次调度中，让hello程序只运行1次
+#define PAL_PRIORITY 5
 
 void load_prog(const char *filename) {
   int i = nr_proc ++;
@@ -32,8 +36,16 @@ _RegSet* schedule(_RegSet *prev) {
     current->tf = prev;
   }
   
-  // 简单的轮流调度：在仙剑奇侠传和hello程序之间切换
-  current = (current == &pcb[0] ? &pcb[1] : &pcb[0]);
+  // 优先级调度：使仙剑奇侠传获得更多CPU时间
+  count = (count + 1) % PAL_PRIORITY;
+  
+  if (count == 0 && nr_proc > 1) {
+    // 每PAL_PRIORITY次调度中，只让hello程序运行1次
+    current = &pcb[1];
+  } else {
+    // 其余时间都让仙剑奇侠传运行
+    current = &pcb[0];
+  }
   
   // 切换到新进程的地址空间
   _switch(&current->as);
