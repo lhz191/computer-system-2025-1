@@ -15,30 +15,31 @@ void free_page(void *p) {
 }
 
 int mm_brk(uint32_t new_brk) {
+  // 首次调用时初始化
   if (current->cur_brk == 0) {
     current->cur_brk = current->max_brk = new_brk;
+    return 0;
   }
-  else {
-    if (new_brk > current->max_brk) {
-      // 计算需要映射的起始和结束地址
-      uint32_t first = PGROUNDUP(current->max_brk);
-      uint32_t end = PGROUNDDOWN(new_brk);
-      
-      // 确保映射整个区域，包括页边界
-      for (uint32_t va = first; va <= end; va += PGSIZE) {
-        void* pa = new_page();
-        _map(&(current->as), (void*)va, pa);
-      }
-      
-      current->max_brk = new_brk;
+  
+  // 申请新内存
+  if (new_brk > current->max_brk) {
+    // 向上取整计算起始地址
+    uint32_t start = PGROUNDUP(current->max_brk);
+    // 对于结束地址，也向上取整确保覆盖全部请求区域
+    uint32_t end = PGROUNDUP(new_brk);
+    
+    // 映射页面
+    for (uint32_t addr = start; addr < end; addr += PGSIZE) {
+      void *pa = new_page();
+      _map(&(current->as), (void*)addr, pa);
     }
-
-    current->cur_brk = new_brk;
+    
+    current->max_brk = new_brk;
   }
-
+  
+  current->cur_brk = new_brk;
   return 0;
 }
-
 void init_mm() {
   pf = (void *)PGROUNDUP((uintptr_t)_heap.start);
   Log("free physical pages starting from %p", pf);
