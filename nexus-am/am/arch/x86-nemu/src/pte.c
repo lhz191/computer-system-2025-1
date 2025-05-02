@@ -100,5 +100,35 @@ void _unmap(_Protect *p, void *va) {
 }
 
 _RegSet *_umake(_Protect *p, _Area ustack, _Area kstack, void *entry, char *const argv[], char *const envp[]) {
-  return NULL;
+  // 计算陷阱帧在用户栈底部的位置
+  uintptr_t tf_addr = (uintptr_t)ustack.end - sizeof(_RegSet);
+  _RegSet *tf = (_RegSet *)tf_addr;
+  
+  // 将陷阱帧初始化为0
+  memset(tf, 0, sizeof(_RegSet));
+  
+  // 将CS设置为8，这是为了保证differential testing的正确运行
+  tf->cs = 8;
+  
+  // 设置EIP指向用户程序的入口点（Navy-apps的入口点）
+  tf->eip = (uintptr_t)entry;
+  
+  // 设置EFLAGS，启用中断（IF标志位）
+  tf->eflags = 0x202; // 0x2为保留位，0x200为IF中断标志位
+  
+  // 在Navy-apps中，_start()函数需要argc、argv和envp参数
+  // 在陷阱帧上方设置_start()函数的栈帧
+  uintptr_t *_start_frame = (uintptr_t*)(tf_addr - 4 * sizeof(uintptr_t));
+  
+  // _start()函数栈帧结构：[argc][argv][envp][返回地址]
+  // 但由于_start()函数永远不会返回，我们不需要设置返回地址
+  _start_frame[0] = 0;          // argc = 0
+  _start_frame[1] = 0;          // argv = NULL
+  _start_frame[2] = 0;          // envp = NULL
+  
+  // 设置ESP寄存器指向_start()函数的栈帧
+  tf->esp = (uintptr_t)_start_frame;
+  
+  // 返回陷阱帧指针，由Nanos-lite将此指针记录到用户进程PCB的tf字段中
+  return tf;
 }
