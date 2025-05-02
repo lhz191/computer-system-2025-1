@@ -6,15 +6,13 @@ static PCB pcb[MAX_NR_PROC];
 static int nr_proc = 0;
 PCB *current = NULL;
 
-uintptr_t loader(_Protect *as, const char *filename);
-
 void load_prog(const char *filename) {
   int i = nr_proc ++;
   _protect(&pcb[i].as);
 
   uintptr_t entry = loader(&pcb[i].as, filename);
 
-  // // TODO: remove the following three lines after you have implemented _umake()
+  // Comment out the following three lines after implementing _umake()
   // _switch(&pcb[i].as);
   // current = &pcb[i];
   // ((void (*)(void))entry)();
@@ -27,5 +25,18 @@ void load_prog(const char *filename) {
 }
 
 _RegSet* schedule(_RegSet *prev) {
+  // Save the context of the current process
+  if (current != NULL) {
+    current->tf = prev;
+  }
+  
+  // Always select the first process (only one user process for now)
+  if (nr_proc > 0) {
+    current = &pcb[0];
+    _switch(&current->as);
+    return current->tf;
+  }
+  
+  // No processes available
   return NULL;
 }
