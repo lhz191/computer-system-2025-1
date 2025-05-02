@@ -12,6 +12,15 @@ static int count = 0;
 // 每PAL_PRIORITY次调度中，让hello程序只运行1次
 #define PAL_PRIORITY 5
 
+// 当前游戏：0表示仙剑奇侠传，2表示videotest
+static int current_game = 0;
+
+// 在仙剑奇侠传和videotest之间切换
+void switch_game() {
+  current_game = (current_game == 0) ? 2 : 0;
+  printf("Switching to %s\n", current_game == 0 ? "Pal" : "VideoTest");
+}
+
 void load_prog(const char *filename) {
   int i = nr_proc ++;
   _protect(&pcb[i].as);
@@ -36,15 +45,15 @@ _RegSet* schedule(_RegSet *prev) {
     current->tf = prev;
   }
   
-  // 优先级调度：使仙剑奇侠传获得更多CPU时间
+  // 优先级调度：在当前游戏和hello程序之间切换
   count = (count + 1) % PAL_PRIORITY;
   
   if (count == 0 && nr_proc > 1) {
-    // 每PAL_PRIORITY次调度中，只让hello程序运行1次
+    // 每PAL_PRIORITY次调度中，选择一次hello程序(index 1)
     current = &pcb[1];
   } else {
-    // 其余时间都让仙剑奇侠传运行
-    current = &pcb[0];
+    // 其他时间选择当前游戏(index 0或2)
+    current = &pcb[current_game];
   }
   
   // 切换到新进程的地址空间

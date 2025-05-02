@@ -1,4 +1,5 @@
 #include "common.h"
+#include "../include/proc.h" // 添加proc.h引用以使用switch_game函数
 
 #define NAME(key) \
   [_KEY_##key] = #key,
@@ -8,6 +9,9 @@ static const char *keyname[256] __attribute__((used)) = {
   _KEYS(NAME)
 };
 
+// 声明switch_game函数
+void switch_game();
+
 size_t events_read(void *buf, size_t len) {
   int key = _read_key();
   bool down = false;
@@ -15,6 +19,12 @@ size_t events_read(void *buf, size_t len) {
     key ^= 0x8000;
     down = true;
   }
+  
+  // Pa4.3后续 检测F12键按下，切换游戏
+  if (key == _KEY_F12 && down) {
+    switch_game(); // 在仙剑奇侠传和videotest之间切换
+  }
+  
   if(key == _KEY_NONE) {
     uint32_t ut = _uptime();
     sprintf(buf, "t %d\n", ut);
