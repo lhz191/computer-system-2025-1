@@ -1,4 +1,5 @@
 #include <x86.h>
+#include <string.h>  // 添加string.h以使用memset函数
 
 #define PG_ALIGN __attribute((aligned(PGSIZE)))//页
 

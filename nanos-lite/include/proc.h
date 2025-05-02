@@ -19,4 +19,10 @@ typedef union {
 
 extern PCB *current;
 
+// 添加loader函数的声明
+uintptr_t loader(_Protect *as, const char *filename);
+
+// 添加schedule函数的声明
+_RegSet* schedule(_RegSet *prev);
+
 #endif
