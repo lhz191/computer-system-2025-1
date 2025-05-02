@@ -67,33 +67,16 @@ void _switch(_Protect *p) {
 }
 
 void _map(_Protect *p, void *va, void *pa) {
-  // Pa4.1: 实现虚拟地址到物理地址的映射
-  PDE *pgdir = (PDE*)p->ptr;  // 获取页目录基址
-  
-  // 计算页目录索引和页表索引
-  uint32_t pde_idx = PDX(va);  // 取虚拟地址的高10位作为页目录索引
-  uint32_t pte_idx = PTX(va);  // 取虚拟地址的中10位作为页表索引
-  
-  PTE *ptab;
-  // 检查页目录项是否存在，不存在则创建一个新的页表
-  if (!(pgdir[pde_idx] & PTE_P)) {
-    // 申请一个新页用作页表
-    ptab = (PTE*)palloc_f();
-    
-    // 初始化页表，将所有页表项设为无效
-    for (int i = 0; i < NR_PTE; i++) {
-      ptab[i] = 0;
+    PDE *pgdirs=p->ptr;
+    PDE *pde=&pgdirs[PDX(va)];
+    PTE *pgtabs;
+    if(*pde&PTE_P)  pgtabs=(PTE*)PTE_ADDR(*pde);
+    else
+    {
+        pgtabs=(PTE *)palloc_f();
+		    *pde=PTE_ADDR(pgtabs)|PTE_P;
     }
-    
-    // 更新页目录项，指向新的页表，并设置存在位和读写位
-    pgdir[pde_idx] = (uint32_t)ptab | PTE_P | PTE_W | PTE_U;
-  } else {
-    // 页目录项已存在，获取页表地址
-    ptab = (PTE*)(pgdir[pde_idx] & ~0xFFF);  // 清除低12位标志位得到页表基址
-  }
-  
-  // 更新页表项，建立va到pa的映射
-  ptab[pte_idx] = (uint32_t)pa | PTE_P | PTE_W | PTE_U;
+    pgtabs[PTX(va)]=PTE_ADDR(pa)|PTE_P;
 }
 
 void _unmap(_Protect *p, void *va) {
