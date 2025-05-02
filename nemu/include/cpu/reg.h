@@ -85,6 +85,9 @@ typedef struct {
   // PA4.1: 添加CR0和CR3寄存器用于分页
   CR0 cr0;  // 控制寄存器0，PG位(0x80000000)用于开启分页机制
   CR3 cr3;  // 页目录基址寄存器，存储页目录的物理地址
+  
+  // 添加INTR成员，用于表示中断请求
+  bool INTR;
 
 } CPU_state;
 

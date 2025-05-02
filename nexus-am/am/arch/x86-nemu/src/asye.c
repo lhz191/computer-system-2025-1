@@ -6,6 +6,7 @@ static _RegSet* (*H)(_Event, _RegSet*) = NULL;
 void vecsys();
 void vecnull();
 void vecself();
+void vectime();  // Pa4.3 声明时钟中断处理函数
 
 _RegSet* irq_handle(_RegSet *tf) {
   _RegSet *next = tf;
@@ -14,6 +15,7 @@ _RegSet* irq_handle(_RegSet *tf) {
     switch (tf->irq) {
       case 0x80: ev.event = _EVENT_SYSCALL; break;
       case 0x81: ev.event = _EVENT_TRAP; break;  // Handle kernel trap
+      case 32: ev.event = _EVENT_IRQ_TIME; break;  // Pa4.3 处理时钟中断
       default: ev.event = _EVENT_ERROR; break;
     }
 
@@ -34,11 +36,13 @@ void _asye_init(_RegSet*(*h)(_Event, _RegSet*)) {
     idt[i] = GATE(STS_TG32, KSEL(SEG_KCODE), vecnull, DPL_KERN);
   }
 
-  // -------------------- system call --------------------------
   idt[0x80] = GATE(STS_TG32, KSEL(SEG_KCODE), vecsys, DPL_USER);
   
-  // -------------------- kernel trap --------------------------
+  // Pa4.2 -------------------- kernel trap --------------------------
   idt[0x81] = GATE(STS_TG32, KSEL(SEG_KCODE), vecself, DPL_KERN);
+
+  // Pa4.3 -------------------- timer interrupt ----------------------
+  idt[32] = GATE(STS_TG32, KSEL(SEG_KCODE), vectime, DPL_KERN);
 
   set_idt(idt, sizeof(idt));
 

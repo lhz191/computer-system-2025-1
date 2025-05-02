@@ -1,6 +1,9 @@
 #include "cpu/exec.h"
 #include "all-instr.h"
 
+// 添加raise_intr函数的声明
+void raise_intr(uint8_t NO, vaddr_t save_addr);
+
 typedef struct {
   DHelper decode;
   EHelper execute;
@@ -345,4 +348,13 @@ void exec_wrapper(bool print_flag) {
   void difftest_step(uint32_t);
   difftest_step(eip);
 #endif
+
+  // Pa4.3 添加轮询INTR引脚的代码，检查是否有硬件中断到来
+  #define TIMER_IRQ 32
+  
+  if (cpu.INTR && cpu.eflags.IF) {
+    cpu.INTR = false;
+    raise_intr(TIMER_IRQ, cpu.eip);
+    update_eip();
+  }
 }

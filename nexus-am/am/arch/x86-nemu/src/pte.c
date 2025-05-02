@@ -115,7 +115,8 @@ _RegSet *_umake(_Protect *p, _Area ustack, _Area kstack, void *entry, char *cons
   tf->eip = (uintptr_t)entry;
   
   // 设置EFLAGS，启用中断（IF标志位）
-  tf->eflags = 0x202; // 0x2为保留位，0x200为IF中断标志位
+  // 0x202 = 0x2 (保留位) | 0x200 (IF中断标志位)
+  tf->eflags = 0x202;
   
   // 在Navy-apps中，_start()函数需要argc、argv和envp参数
   // 在陷阱帧上方设置_start()函数的栈帧

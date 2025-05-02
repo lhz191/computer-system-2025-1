@@ -12,6 +12,10 @@ void raise_intr(uint8_t NO, vaddr_t save_addr) {
   
   // 1. 将EFLAGS, CS, EIP保存到栈上
   rtl_push(&cpu.eflags.val);  // 保存EFLAGS
+  
+  // 在保存EFLAGS后，将IF位置为0，让处理器进入关中断状态
+  cpu.eflags.IF = 0;
+  
   rtl_push(&cpu.cs);          // 保存CS
   rtl_push(&save_addr);       // 保存EIP (下一条指令的地址)
   
@@ -31,4 +35,6 @@ void raise_intr(uint8_t NO, vaddr_t save_addr) {
 }
 
 void dev_raise_intr() {
+  // 设置INTR引脚为高电平，表示有中断请求
+  cpu.INTR = true;
 }
