@@ -67,6 +67,7 @@ void _switch(_Protect *p) {
 }
 
 void _map(_Protect *p, void *va, void *pa) {
+  // printf("1111");
   // Pa4.1: 实现虚拟地址到物理地址的映射
   PDE *pgdir = (PDE*)p->ptr;  // 获取页目录基址
   
@@ -88,8 +89,8 @@ void _map(_Protect *p, void *va, void *pa) {
     pgdir[pde_idx] = (uint32_t)ptab | PTE_P | PTE_W | PTE_U;
   }
   
-  // 获取页表地址
-  PTE *ptab = (PTE*)(pgdir[pde_idx] & ~0xFFF);  // 清除低12位标志位得到页表基址
+  // 获取页表地址 - 使用PTE_ADDR宏替代手动掩码
+  PTE *ptab = (PTE*)PTE_ADDR(pgdir[pde_idx]);
   
   // 更新页表项，建立va到pa的映射
   ptab[pte_idx] = (uint32_t)pa | PTE_P | PTE_W | PTE_U;
