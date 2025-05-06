@@ -234,7 +234,7 @@ opcode_entry opcode_table [512] = {
   /* 0x1c */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa4.1 - 控制寄存器访问指令: * 0x20: MOV CR0/CR3 -> GPR (从控制寄存器读)
    * 0x22: MOV GPR -> CR0/CR3 (写入控制寄存器)*/
-  /* 0x20 */	EMPTY, EMPTY, IDEX(E2G, mov_r2cr), EMPTY,
+  /* 0x20 */	IDEX(G2E, mov_cr2r), EMPTY, IDEX(E2G, mov_r2cr), EMPTY,
   /* 0x24 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x28 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0x2c */	EMPTY, EMPTY, EMPTY, EMPTY,

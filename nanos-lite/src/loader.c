@@ -15,22 +15,39 @@ ssize_t fs_read(int fd, void *buf, size_t len);
 int fs_close(int fd);
 
 uintptr_t loader(_Protect *as, const char *filename) {
-    int fd=fs_open(filename,0,0);
-    // Log("fd=%d",fd);
-    // fs_read(fd,DEFAULT_ENTRY,fs_filesz(fd));
-    int size=fs_filesz(fd);
-    int pnums=size/PGSIZE;
-    if(size%PGSIZE==0)  pnums++;
-    void *pa=NULL;
-    void *va=DEFAULT_ENTRY;
-    for(int i=0;i<=pnums;i++)
-    {
-        pa=new_page();//申请空闲页
-        _map(as,va,pa);//物理页->用户程序虚拟地址
-        fs_read(fd,pa,PGSIZE);//读一页
-        va+=PGSIZE;
-        // Log("%x",va);
-    }
-    fs_close(fd);
-  return (uintptr_t)DEFAULT_ENTRY;
+  // size_t size = get_ramdisk_size();
+  // ramdisk_read(DEFAULT_ENTRY, 0, size);
+  // return (uintptr_t)DEFAULT_ENTRY;
+
+
+  int fd = fs_open(filename, 0, 0);// 打开指定的文件
+  if (fd < 0) {
+    panic("loader: cannot open file '%s'", filename);
+  }
+  size_t size = fs_filesz(fd);// 获取文件大小
+  Log("loader: loading '%s' (%d bytes) to memory address 0x%x", 
+      filename, size, DEFAULT_ENTRY);
+  
+  // Pa4.1: 以页为单位加载用户程序，使其运行在独立的虚拟地址空间
+  int pages = (size + PGSIZE - 1) / PGSIZE; // 向上取整，计算需要多少页
+  void *pa;
+  void *va = (void *)DEFAULT_ENTRY;
+  
+  for (int i = 0; i < pages; i++) {
+    // 1. 申请一页空闲的物理页
+    pa = new_page();
+    
+    // 2. 把这一物理页映射到用户程序的虚拟地址空间中
+    _map(as, va, pa);  // Pa4.1: 修正_map参数，去掉不需要的权限参数
+    
+    // 3. 从文件中读入一页或剩余内容到这一物理页上
+    size_t bytes_to_read = (i == pages - 1) ? (size - i * PGSIZE) : PGSIZE;
+    fs_read(fd, pa, bytes_to_read);
+    
+    // 移动虚拟地址指针到下一页
+    va += PGSIZE;
+  }
+  
+  fs_close(fd);
+  return (uintptr_t)DEFAULT_ENTRY;//返回程序入口地址  
 }
