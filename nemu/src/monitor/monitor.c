@@ -91,9 +91,10 @@ static inline void restart() {
   /*Pa2.2 End*/
   /*Pa3.2 Begin*/
   cpu.cs = 8;
-  cpu.cr0.val = 0x60000011;
   /*Pa3.2 End*/
-
+  /*Pa4.1 Begin*/
+  cpu.cr0.val = 0x60000011;
+  /*Pa4.1 End*/
 #ifdef DIFF_TEST
   init_qemu_reg();
 #endif
