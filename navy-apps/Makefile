@@ -5,7 +5,6 @@ APPS = $(dir $(shell find apps tests -mindepth 2 -name "Makefile"))
 .PHONY: fsimg $(APPS) $(LIBS) clean
 
 fsimg: $(APPS)
-
 $(APPS): %: $(LIBS)
 	-$(MAKE) -C $@ install
 

@@ -6,7 +6,7 @@ shift
 
 make -C $DIR/boot -s
 
-ld -melf_i386 --verbose --gc-sections -T $DIR/loader.ld -e _start -o $DEST $DIR/boot/start.o --start-group $@ -L/usr/lib/gcc/i686-linux-gnu/5 -lgcc --end-group
+ld -melf_i386 --gc-sections -T $DIR/loader.ld -e _start -o $DEST $DIR/boot/start.o --start-group $@ --end-group
 objdump -d $DEST > $DEST.txt
 
 objcopy -S --set-section-flags .bss=alloc,contents -O binary $DEST $DEST.bin

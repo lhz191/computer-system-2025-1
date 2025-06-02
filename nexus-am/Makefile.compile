@@ -55,6 +55,8 @@ CFLAGS_COMMON = -m32 -fno-pic -fno-builtin -fno-stack-protector -fno-omit-frame-
 CFLAGS   += $(CFLAGS_COMMON)
 CXXFLAGS += $(CFLAGS_COMMON) -ffreestanding -fno-rtti -fno-exceptions
 ASFLAGS  += -m32
+# ... 其他 CFLAGS, ASFLAGS 定义 ...
+LDFLAGS += -L/usr/lib/gcc/i686-linux-gnu/5 -lgcc
 endif
 
 # Files to be compiled
