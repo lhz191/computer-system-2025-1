@@ -8,77 +8,65 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   // 期望结果: (a_real * b_real) * 2^16
   // 因此，(a * b) / 2^16  (即右移16位)
   // 中间乘积可能达到64位
-  printf("DEBUG: F_mul_F called with a=0x%x (%d), b=0x%x (%d)\n", a, a, b, b);
+  // printf("DEBUG: F_mul_F called with a=0x%x (%d), b=0x%x (%d)\\n", a, a, b, b);
   
-  // 处理特殊情况
   if (a == 0 || b == 0) {
     return 0;
   }
 
-  // 检查是否会溢出
-  if (a > 0 && b > 0 && a > (INT32_MAX / b)) {
-    // 正数溢出
-    return INT32_MAX;
-  }
-  if (a < 0 && b < 0 && a < (INT32_MAX / b)) {
-    // 负数溢出
-    return INT32_MAX;
-  }
-  if ((a > 0 && b < 0 && b < (INT32_MIN / a)) ||
-      (a < 0 && b > 0 && a < (INT32_MIN / b))) {
-    // 负数溢出
+  int64_t temp_prod = (int64_t)a * b;
+
+  // 检查缩放后的结果是否溢出32位
+  // (temp_prod / 2^16) should be within [INT32_MIN, INT32_MAX]
+  // So, temp_prod should be within [INT32_MIN * 2^16, INT32_MAX * 2^16]
+  
+  const int64_t min_val_scaled = (int64_t)INT32_MIN << 16;
+  const int64_t max_val_scaled = (int64_t)INT32_MAX << 16;
+
+  if (temp_prod < min_val_scaled) {
+    // printf("DEBUG: F_mul_F: Underflow detected. temp_prod=0x%llx, clamping to INT32_MIN\\n", (long long)temp_prod);
     return INT32_MIN;
   }
+  if (temp_prod > max_val_scaled) {
+    // printf("DEBUG: F_mul_F: Overflow detected. temp_prod=0x%llx, clamping to INT32_MAX\\n", (long long)temp_prod);
+    return INT32_MAX;
+  }
 
-  int64_t temp_prod = (int64_t)a * b;
   FLOAT result = (FLOAT)(temp_prod >> 16);
   
-  printf("DEBUG: F_mul_F: temp_prod=0x%llx (%lld), result=0x%x (%d)\n", (long long)temp_prod, (long long)temp_prod, result, result);
+  // printf("DEBUG: F_mul_F: temp_prod=0x%llx (%lld), result=0x%x (%d)\\n", (long long)temp_prod, (long long)temp_prod, result, result);
   return result;
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
     assert(b != 0);
-    // 使用32位运算实现定点数除法
-    // 为了保持精度，我们需要：
-    // 1. 检查溢出风险
-    // 2. 根据需要调整移位
-    
-    int sign = 1;
-    if (a < 0) {
-        sign = -sign;
-        a = -a;
+    // printf("DEBUG: F_div_F called with a=0x%x (%d), b=0x%x (%d)\\n", a, a, b, b);
+
+    // (a_real / b_real) * 2^16
+    // = ( (a/2^16) / (b/2^16) ) * 2^16
+    // = (a/b) * 2^16
+    // So, we calculate (a * 2^16) / b, where a and b are already scaled by 2^16
+    // This becomes ((a_int * 2^16) * 2^16) / (b_int * 2^16) for actual unscaled values
+    // which is (a_int / b_int) * 2^16.
+    // Using current a, b (which are FLOATs, i.e. scaled by 2^16):
+    // ( (a_input_scaled_by_2_16) << 16 ) / b_input_scaled_by_2_16
+
+    int64_t temp_a = (int64_t)a << 16; // Intermediate value can be 32+16 = 48 bits + sign
+    int64_t quotient = temp_a / b;     // b is FLOAT (32-bit int). Result can be 48 bits.
+
+    // Clamp the 64-bit quotient to 32-bit range
+    if (quotient < INT32_MIN) {
+        // printf("DEBUG: F_div_F: Underflow detected. quotient=0x%llx, clamping to INT32_MIN\\n", (long long)quotient);
+        return INT32_MIN;
     }
-    if (b < 0) {
-        sign = -sign;
-        b = -b;
+    if (quotient > INT32_MAX) {
+        // printf("DEBUG: F_div_F: Overflow detected. quotient=0x%llx, clamping to INT32_MAX\\n", (long long)quotient);
+        return INT32_MAX;
     }
 
-    // 计算需要移位的位数，避免溢出
-    // 找到a的最高位
-    int a_shift = 0;
-    FLOAT a_temp = a;
-    while (a_temp > 0 && a_shift < 16) {
-        a_temp >>= 1;
-        a_shift++;
-    }
-
-    // 根据a的值调整移位
-    // 如果a比较大，我们减少左移的位数以防溢出
-    int shift = 16;
-    if (a_shift > 16) {
-        shift = 32 - a_shift;  // 确保不会溢出
-    }
-
-    // 执行除法，结果需要左移以达到定点数的精度
-    FLOAT result;
-    if (shift > 0) {
-        result = ((a << shift) / b) << (16 - shift);
-    } else {
-        result = (a / b) << 16;
-    }
-
-    return sign * result;
+    FLOAT result = (FLOAT)quotient;
+    // printf("DEBUG: F_div_F: temp_a(a<<16)=0x%llx, b=0x%x, quotient=0x%llx, result=0x%x\\n", (long long)temp_a, b, (long long)quotient, result);
+    return result;
 }
 
 FLOAT f2F(float ft) {
