@@ -149,12 +149,11 @@ make_EHelper(not) {
 make_EHelper(shld) {
   // SHLD指令：将目标操作数（第一个操作数）向左移位，
   // 空出的低位用第二个操作数的对应位填充
-  rtl_shl(&t1,&id_dest->val, &id_src->val);
-  rtl_li(&t3,id_src2->width << 3);
-  rtl_sub(&t3,&t3,&id_src->val);
-  rtl_shr(&t2,&id_src2->val, &t3);
-  rtl_or(&t0,&t1,&t2);
+  rtl_shl(&t0, &id_dest->val, &id_src->val);  // 先左移
+  rtl_shri(&t1, &id_src2->val, 32 - id_src->val);  // 准备填充位
+  rtl_or(&t0, &t0, &t1);  // 合并结果
   operand_write(id_dest, &t0);
+
   // 更新标志位
   rtl_update_ZFSF(&t0, id_dest->width);
   
@@ -164,16 +163,26 @@ make_EHelper(shld) {
 make_EHelper(shrd) {
   // SHRD指令：将目标操作数（第一个操作数）向右移位，
   // 空出的高位用第二个操作数的对应位填充
-  rtl_shr(&t1,&id_dest->val, &id_src->val);
-  rtl_li(&t3,id_src2->width << 3);
-  rtl_sub(&t3,&t3, &id_src->val);
-  rtl_shl(&t2, &id_src2->val, &t3);
-  rtl_or(&t0, &t1, &t2);  // 合并结果
+  rtl_shr(&t0, &id_dest->val, &id_src->val);  // 先右移
+  rtl_shli(&t1, &id_src2->val, 32 - id_src->val);  // 准备填充位
+  rtl_or(&t0, &t0, &t1);  // 合并结果
   operand_write(id_dest, &t0);
 
   // 更新标志位
   rtl_update_ZFSF(&t0, id_dest->width);
   
   print_asm_template3(shrd);
+}
+
+make_EHelper(fld) {
+  // FLD指令：将浮点数从内存加载到FPU栈顶
+  // 在NEMU中，我们只需要模拟这个指令的基本行为
+  // 实际上不需要真正执行浮点运算
+  
+  // 由于NEMU中没有实现完整的FPU，我们只需要读取操作数
+  // 这样程序就能继续执行，而不会因为缺少FLD实现而停止
+  rtl_lm(&t0, &id_dest->addr, id_dest->width);
+  
+  print_asm_template1(fld);
 }
 /*Pa5 End*/

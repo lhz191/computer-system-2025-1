@@ -7,7 +7,7 @@ make_EHelper(operand_size);
 make_EHelper(inv);
 make_EHelper(nemu_trap);
 
-
+make_EHelper(fld);  // Pa5：添加fld指令声明
 
 make_EHelper(call);
 make_EHelper(sub);
