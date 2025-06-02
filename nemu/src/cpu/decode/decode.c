@@ -122,6 +122,17 @@ static inline make_DopHelper(O) {
 #endif
 }
 
+/* Eb <- Gb
+ * Ev <- Gv
+ */
+make_DHelper(G2E) {
+  decode_op_rm(eip, id_dest, true, id_src, true);
+}
+
+make_DHelper(mov_G2E) {
+  decode_op_rm(eip, id_dest, false, id_src, true);
+}
+
 /* Gb <- Eb
  * Gv <- Ev
  */
@@ -145,16 +156,23 @@ make_DHelper(I2a) {
   decode_op_I(eip, id_src, true);
 }
 
-/* Gv <- EvIb
- * Gv <- EvIv
+/* Gv <- EvIv
  * use for imul */
 make_DHelper(I_E2G) {
   decode_op_rm(eip, id_src2, true, id_dest, false);
   decode_op_I(eip, id_src, true);
 }
 
-
-
+/* Pa5 Begin */
+/* For SHLD/SHRD instructions:
+ * Ev <- Ev << count, Gv
+ * where count is an 8-bit immediate */
+void decode_Ib_G2E(vaddr_t *eip) {
+  decode_op_rm(eip, id_dest, true, id_src2, true);  // Get Ev and Gv
+  id_src->width = 1;  // count is 8-bit
+  decode_op_I(eip, id_src, true);  // Get immediate count
+}
+/* Pa5 End */
 
 /* Eb <- Ib
  * Ev <- Iv
@@ -251,19 +269,14 @@ make_DHelper(gp2_Ib2E) {
 }
 
 /* Ev <- GvIb
- * use for shld/shrd
- * Pa5: SHLD/SHRD instructions decode
- * Format: Ev <- Ev op count, Gv
+ * use for shld/shrd */
+/*Pa5: SHLD/SHRD instructions:
+ * Ev <- Ev op count, Gv
  * where:
  * - Ev is the destination operand
  * - count is an 8-bit immediate
  * - Gv is the source operand for fill bits
  */
-make_DHelper(Ib_G2E) {
-  decode_op_rm(eip, id_dest, true, id_src2, true);  // Get Ev and Gv
-  id_src->width = 1;  // count is 8-bit
-  decode_op_I(eip, id_src, true);  // Get immediate count
-}
 
 make_DHelper(O2a) {
   decode_op_O(eip, id_src, true);
