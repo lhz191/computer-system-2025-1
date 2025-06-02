@@ -104,7 +104,7 @@ ssize_t fs_write(int fd, const void *buf, size_t len) {
   // 检查文件描述符是否有效
   assert(fd >= 0 && fd < NR_FILES);
   
-  Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
+  // Log("fs_write: fd=%d, buf=%p, len=%d", fd, buf, len);
   //1.stdout：将数据输出到串口或控制台。
   //2.stderr：用于标准错误输出。
   //3./dev/fb：用于写入帧缓冲区。写入的数据通常是图像数据，需要按照特定的格式（如 RGB）写入帧缓冲区。
