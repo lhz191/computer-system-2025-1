@@ -40,7 +40,7 @@ int main() {
 // uint32_t entry = loader(NULL, "/bin/pal");
 //   ((void (*)(void))entry)();
 load_prog("/bin/pal");  // Pa4.1: 使用load_prog加载用户程序到独立的虚拟地址空间
-load_prog("/bin/hello");
+// load_prog("/bin/hello");
 // load_prog("/bin/videotest");
 
 _trap();  // Use kernel self-trap to switch to user process
