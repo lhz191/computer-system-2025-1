@@ -188,7 +188,7 @@ opcode_entry opcode_table [512] = {
   /*Pa2.1 End*/
   /*Pa2.1 0x90 nop指令*/
   /* 0x90 */	EX(nop), EMPTY, EMPTY, EMPTY,
-  /* 0x94 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /* 0x94 */	IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1), IDEXW(E, setcc, 1), EMPTY,
   /*Pa2.2 0x99 cltd*/
   /* 0x98 */	EX(cwtl), EX(cltd), EMPTY, EMPTY,
   /* 0x9c */	EMPTY, EMPTY, EMPTY, EMPTY,
@@ -269,7 +269,8 @@ opcode_entry opcode_table [512] = {
   /* 0x8c */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
   /* 0x90 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*0x0f 94 setcc*/
-  /* 0x94 */	IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1), EMPTY, EMPTY,
+  /*Pa5: 实现SETBE(0F 96)条件设置指令。SETBE指令检查CF或ZF是否为1。*/
+  /* 0x94 */	IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1), IDEXW(E, setcc, 1), EMPTY,
   /* 0x98 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.3 benchmark 0x0f 9f: setcc*/
   /* 0x9c */	EMPTY, EMPTY, IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1),
