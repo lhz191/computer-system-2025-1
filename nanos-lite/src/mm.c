@@ -17,7 +17,7 @@ void free_page(void *p) {
 /* The brk() system call handler. */
 int mm_brk(uint32_t new_brk) {
   if (current->cur_brk == 0) {
-    Log("Initializing memory break at 0x%08x", new_brk);
+    // Log("Initializing memory break at 0x%08x", new_brk);
     current->cur_brk = current->max_brk = new_brk;
   }
   else {
@@ -31,7 +31,7 @@ int mm_brk(uint32_t new_brk) {
         end -= PGSIZE;
       }
       
-      Log("Extending memory break from 0x%08x to 0x%08x", current->max_brk, new_brk);
+      // Log("Extending memory break from 0x%08x to 0x%08x", current->max_brk, new_brk);
       
       // 遍历需要映射的每一页，分配物理内存并映射
       for (uint32_t va = first; va <= end; va += PGSIZE) {
@@ -42,7 +42,7 @@ int mm_brk(uint32_t new_brk) {
         }
         
         _map(&current->as, (void*)va, pa);
-        Log("Mapped page at 0x%08x to physical address %p", va, pa);
+        // Log("Mapped page at 0x%08x to physical address %p", va, pa);
       }
 
       current->max_brk = new_brk;
