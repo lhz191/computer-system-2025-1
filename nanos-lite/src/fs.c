@@ -43,7 +43,7 @@ int fs_open(const char *pathname, int flags, int mode) {
       return i;  // 返回文件描述符（即文件记录表索引）
     }
   }
-  panic("fs_open: file '%s' not found", pathname);// 未找到文件
+  // panic("fs_open: file '%s' not found", pathname);// 未找到文件
   assert(0);
   return -1;
 }

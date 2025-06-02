@@ -57,7 +57,7 @@ _RegSet* do_syscall(_RegSet *r) {
       int flags = SYSCALL_ARG3(r);
       int mode = SYSCALL_ARG4(r);
       
-      Log("syscall: open('%s', %d, %d)", pathname, flags, mode);
+      // Log("syscall: open('%s', %d, %d)", pathname, flags, mode);
       SYSCALL_ARG1(r) = fs_open(pathname, flags, mode);
       break;
     }
@@ -74,14 +74,14 @@ _RegSet* do_syscall(_RegSet *r) {
       off_t offset = SYSCALL_ARG3(r);
       int whence = SYSCALL_ARG4(r);
       
-      Log("syscall: lseek(%d, %d, %d)", fd, offset, whence);
+      // Log("syscall: lseek(%d, %d, %d)", fd, offset, whence);
       SYSCALL_ARG1(r) = fs_lseek(fd, offset, whence);
       break;
     }
     case SYS_close: {
       int fd = SYSCALL_ARG2(r);
       
-      Log("syscall: close(%d)", fd);
+      // Log("syscall: close(%d)", fd);
       SYSCALL_ARG1(r) = fs_close(fd);
       break;
     }
