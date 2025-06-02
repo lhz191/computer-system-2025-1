@@ -9,8 +9,30 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   // 因此，(a * b) / 2^16  (即右移16位)
   // 中间乘积可能达到64位
   printf("DEBUG: F_mul_F called with a=0x%x (%d), b=0x%x (%d)\n", a, a, b, b);
+  
+  // 处理特殊情况
+  if (a == 0 || b == 0) {
+    return 0;
+  }
+
+  // 检查是否会溢出
+  if (a > 0 && b > 0 && a > (INT32_MAX / b)) {
+    // 正数溢出
+    return INT32_MAX;
+  }
+  if (a < 0 && b < 0 && a < (INT32_MAX / b)) {
+    // 负数溢出
+    return INT32_MAX;
+  }
+  if ((a > 0 && b < 0 && b < (INT32_MIN / a)) ||
+      (a < 0 && b > 0 && a < (INT32_MIN / b))) {
+    // 负数溢出
+    return INT32_MIN;
+  }
+
   int64_t temp_prod = (int64_t)a * b;
   FLOAT result = (FLOAT)(temp_prod >> 16);
+  
   printf("DEBUG: F_mul_F: temp_prod=0x%llx (%lld), result=0x%x (%d)\n", (long long)temp_prod, (long long)temp_prod, result, result);
   return result;
 }
@@ -181,6 +203,11 @@ FLOAT Fsqrt(FLOAT x) {
 FLOAT Fpow(FLOAT x, FLOAT y) {
   /* we only compute x^0.333 */
   printf("DEBUG: Fpow called with x=0x%x (%d), y=0x%x (%d) (y is unused by this version)\n", x, x, y, y);
+  
+  // 处理特殊情况
+  if (x == 0) return 0;
+  if (x < 0) return 0;  // 暂时不处理负数
+  
   FLOAT t2, dt, t = int2F(2);
   int iteration_count = 0;
   const int max_iterations = 1000; // Safety break
@@ -191,13 +218,21 @@ FLOAT Fpow(FLOAT x, FLOAT y) {
   do {
     FLOAT prev_t = t;
     t2 = F_mul_F(t, t);
+    if (t2 == 0) {  // 如果t2变得太小，停止迭代
+      printf("DEBUG: Fpow: t2 became 0, stopping iteration\n");
+      return prev_t;
+    }
+    
     FLOAT term1 = F_div_F(x, t2);
     FLOAT term_diff = term1 - t;
-    // Original code: dt = (F_div_F(x, t2) - t) / 3;
-    // This is FLOAT / int division.
     dt = F_div_int(term_diff, 3);
-    // dt = term_diff / 3; // Or direct integer division.
-
+    
+    // 如果dt太小，提前结束
+    if (dt == 0) {
+      printf("DEBUG: Fpow: dt became 0, stopping iteration\n");
+      return t;
+    }
+    
     t += dt;
     iteration_count++;
 
@@ -205,12 +240,13 @@ FLOAT Fpow(FLOAT x, FLOAT y) {
            iteration_count, x, prev_t, t2, term1, term_diff, dt, t, Fabs(dt));
 
     if (iteration_count > max_iterations) {
-        printf("DEBUG: Fpow: MAX ITERATIONS REACHED for x=0x%x. Returning current t=0x%x\n", x, t);
-        break;
+      printf("DEBUG: Fpow: MAX ITERATIONS REACHED for x=0x%x. Returning current t=0x%x\n", x, t);
+      break;
     }
-     if (dt == 0 && prev_t == t) {
-        printf("DEBUG: Fpow: dt is 0 and t unchanged for x=0x%x. Loop terminating. Fabs(dt)=0x%x\n", x, Fabs(dt));
-        break;
+    
+    if (prev_t == t) {
+      printf("DEBUG: Fpow: t unchanged, stopping iteration\n");
+      break;
     }
 
   } while(Fabs(dt) > loop_limit);
@@ -218,4 +254,3 @@ FLOAT Fpow(FLOAT x, FLOAT y) {
   printf("DEBUG: Fpow: Loop finished for x=0x%x after %d iterations. Result t=0x%x (%d)\n", x, iteration_count, t, t);
   return t;
 }
-\
