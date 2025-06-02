@@ -102,6 +102,9 @@ make_DHelper(gp2_1_E);
 make_DHelper(gp2_cl2E);
 make_DHelper(gp2_Ib2E);
 
+/*Pa5: Add declaration for SHLD/SHRD decoder*/
+make_DHelper(Ib_G2E);
+
 make_DHelper(O2a);
 make_DHelper(a2O);
 

@@ -144,3 +144,33 @@ make_EHelper(not) {
   // NOT 指令不影响任何标志位
   print_asm_template1(not);
 }
+
+/*Pa5 Begin*/
+make_EHelper(shld) {
+  // SHLD指令：将目标操作数（第一个操作数）向左移位，
+  // 空出的低位用第二个操作数的对应位填充
+  rtl_shl(&t0, &id_dest->val, &id_src->val);  // 先左移
+  rtl_shri(&t1, &id_src2->val, 32 - id_src->val);  // 准备填充位
+  rtl_or(&t0, &t0, &t1);  // 合并结果
+  operand_write(id_dest, &t0);
+
+  // 更新标志位
+  rtl_update_ZFSF(&t0, id_dest->width);
+  
+  print_asm_template3(shld);
+}
+
+make_EHelper(shrd) {
+  // SHRD指令：将目标操作数（第一个操作数）向右移位，
+  // 空出的高位用第二个操作数的对应位填充
+  rtl_shr(&t0, &id_dest->val, &id_src->val);  // 先右移
+  rtl_shli(&t1, &id_src2->val, 32 - id_src->val);  // 准备填充位
+  rtl_or(&t0, &t0, &t1);  // 合并结果
+  operand_write(id_dest, &t0);
+
+  // 更新标志位
+  rtl_update_ZFSF(&t0, id_dest->width);
+  
+  print_asm_template3(shrd);
+}
+/*Pa5 End*/

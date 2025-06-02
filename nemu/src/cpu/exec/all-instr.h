@@ -97,5 +97,10 @@ make_EHelper(mov_r2cr);
 make_EHelper(mov_cr2r);
 /*Pa4.1 End*/
 
+/*Pa5 Begin*/
+make_EHelper(shld);  // 双精度左移
+make_EHelper(shrd);  // 双精度右移
+/*Pa5 End*/
+
 
 
