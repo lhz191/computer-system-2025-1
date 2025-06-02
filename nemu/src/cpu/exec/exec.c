@@ -188,7 +188,7 @@ opcode_entry opcode_table [512] = {
   /*Pa2.1 End*/
   /*Pa2.1 0x90 nop指令*/
   /* 0x90 */	EX(nop), EMPTY, EMPTY, EMPTY,
-  /* 0x94 */	IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1), IDEXW(E, setcc, 1), EMPTY,
+  /* 0x94 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.2 0x99 cltd*/
   /* 0x98 */	EX(cwtl), EX(cltd), EMPTY, EMPTY,
   /* 0x9c */	EMPTY, EMPTY, EMPTY, EMPTY,
@@ -267,18 +267,17 @@ opcode_entry opcode_table [512] = {
   /* 0x88 */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
   /*Pa2.3 benchmark 0x0f 8c-8f: jmp rel8*/
   /* 0x8c */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
-  /* 0x90 */	EMPTY, EMPTY, EMPTY, IDEXW(E, setcc, 1), /* SETAE/SETNB (0F 93) */
+  /* 0x90 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*0x0f 94 setcc*/
-  /*Pa5: 实现SETBE(0F 96)条件设置指令。SETBE指令检查CF或ZF是否为1。*/
-  /* 0x94 */	IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1), IDEXW(E, setcc, 1), EMPTY, /* SETBE (0F 96) */
+  /* 0x94 */	IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1), EMPTY, EMPTY,
   /* 0x98 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.3 benchmark 0x0f 9f: setcc*/
   /* 0x9c */	EMPTY, EMPTY, IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1),
   /* 0xa0 */	EMPTY, EMPTY, EMPTY, EMPTY,
-  /* 0xa4 */	IDEX(Ib_G2E, shld), EMPTY, EMPTY, EMPTY,
+  /* 0xa4 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xa8 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.2 0x0f af：IMUL r32, r/m32 (有符号整数乘法，双操作数形式)*/
-  /* 0xac */	IDEX(Ib_G2E, shrd), EMPTY, EMPTY, IDEX(E2G, imul2),
+  /* 0xac */	EMPTY, EMPTY, EMPTY, IDEX(E2G, imul2),
   /* 0xb0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.1 0x0f b6: movzx r32, r/m8*/
   /* 0xb4 */	EMPTY, EMPTY, IDEXW(mov_E2G, movzx, 1), IDEXW(mov_E2G, movzx, 2),
