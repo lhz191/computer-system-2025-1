@@ -34,6 +34,14 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
 
   FLOAT result = (FLOAT)(temp_prod >> 16);
   
+  // 新增逻辑：如果结果是0，但原始乘积是一个小的正数，则将其设为1
+  // 这主要用于防止 Fpow 中的 t*t 结果变成0
+  // temp_prod > 0 确保我们只处理正的原始乘积
+  // temp_prod < (1LL << 16) 意味着 temp_prod >> 16 会是0
+  if (result == 0 && temp_prod > 0 && temp_prod < (1LL << 16)) {
+      result = 1; 
+  }
+  
   // printf("DEBUG: F_mul_F: temp_prod=0x%llx (%lld), result=0x%x (%d)\\n", (long long)temp_prod, (long long)temp_prod, result, result);
   return result;
 }
