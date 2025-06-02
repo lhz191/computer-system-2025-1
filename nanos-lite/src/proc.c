@@ -10,7 +10,7 @@ PCB *current = NULL;
 // 用于优先级调度的计数器
 static int count = 0;
 // 每PAL_PRIORITY次调度中，让hello程序只运行1次
-#define PAL_PRIORITY 5
+#define PAL_PRIORITY 10000
 
 // 当前游戏：0表示仙剑奇侠传，2表示videotest
 static int current_game = 0;
