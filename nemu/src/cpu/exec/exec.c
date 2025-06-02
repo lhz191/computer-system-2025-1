@@ -210,7 +210,7 @@ opcode_entry opcode_table [512] = {
   /*Pa5：0xd8 fld指令*/
   /* 0xd8 */	EMPTY, IDEX(E, fld), IDEX(E, fld), EMPTY,
   /*Pa5:0xdd fld指令*/
-  /* 0xdc */	EMPTY, IDEX(E, fld), EMPTY, EMPTY,
+  /* 0xdc */	EMPTY, IDEX(E, fld), EMPTY, IDEX(E, fld),
   /* 0xe0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xe4 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.1 Begin*/
