@@ -16,16 +16,47 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
-  assert(b != 0); // 防止除零
-  // 期望结果: (a_real / b_real) * 2^16
-  // 计算: (a * 2^16) / b = ((a_real * 2^16) * 2^16) / (b_real * 2^16)
-  //                    = (a_real / b_real) * 2^16
-  // 被除数先左移16位以保持精度
-  printf("DEBUG: F_div_F called with a=0x%x (%d), b=0x%x (%d)\n", a, a, b, b);
-  int64_t temp_a_scaled = (int64_t)a << 16;
-  FLOAT result = (FLOAT)(temp_a_scaled / b);
-  printf("DEBUG: F_div_F: temp_a_scaled=0x%llx (%lld), result=0x%x (%d)\n", (long long)temp_a_scaled, (long long)temp_a_scaled, result, result);
-  return result;
+    assert(b != 0);
+    // 使用32位运算实现定点数除法
+    // 为了保持精度，我们需要：
+    // 1. 检查溢出风险
+    // 2. 根据需要调整移位
+    
+    int sign = 1;
+    if (a < 0) {
+        sign = -sign;
+        a = -a;
+    }
+    if (b < 0) {
+        sign = -sign;
+        b = -b;
+    }
+
+    // 计算需要移位的位数，避免溢出
+    // 找到a的最高位
+    int a_shift = 0;
+    FLOAT a_temp = a;
+    while (a_temp > 0 && a_shift < 16) {
+        a_temp >>= 1;
+        a_shift++;
+    }
+
+    // 根据a的值调整移位
+    // 如果a比较大，我们减少左移的位数以防溢出
+    int shift = 16;
+    if (a_shift > 16) {
+        shift = 32 - a_shift;  // 确保不会溢出
+    }
+
+    // 执行除法，结果需要左移以达到定点数的精度
+    FLOAT result;
+    if (shift > 0) {
+        result = ((a << shift) / b) << (16 - shift);
+    } else {
+        result = (a / b) << 16;
+    }
+
+    return sign * result;
 }
 
 FLOAT f2F(float ft) {
