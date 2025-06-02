@@ -33,16 +33,19 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   }
 
   FLOAT result = (FLOAT)(temp_prod >> 16);
+  int coerced_to_one = 0; // Flag
   
   // 新增逻辑：如果结果是0，但原始乘积是一个小的正数，则将其设为1
-  // 这主要用于防止 Fpow 中的 t*t 结果变成0
-  // temp_prod > 0 确保我们只处理正的原始乘积
-  // temp_prod < (1LL << 16) 意味着 temp_prod >> 16 会是0
   if (result == 0 && temp_prod > 0 && temp_prod < (1LL << 16)) {
       result = 1; 
+      coerced_to_one = 1; // Set flag
   }
   
-  // printf("DEBUG: F_mul_F: temp_prod=0x%llx (%lld), result=0x%x (%d)\\n", (long long)temp_prod, (long long)temp_prod, result, result);
+  printf("DEBUG: F_mul_F: temp_prod=0x%llx, initial_result_scaled=0x%x (%d), coerced_to_one=%d, final_result=0x%x (%d)\n", 
+         (long long)temp_prod, 
+         (FLOAT)(temp_prod >> 16), (FLOAT)(temp_prod >> 16), /* Show initial scaled result */ 
+         coerced_to_one, 
+         result, result /* Show final result */);
   return result;
 }
 

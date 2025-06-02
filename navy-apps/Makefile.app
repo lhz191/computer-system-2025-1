@@ -37,7 +37,7 @@ $(APP): $(LIBS) $(OBJS)
 ifeq ($(ISA), native)
 	@g++ -o $(APP) $(OBJS) $(LIB_FILES)
 else
-	@$(LD) $(LDFLAGS) -o $(APP) --start-group $(OBJS) $(LIB_FILES) --end-group
+	@$(LD) $(LDFLAGS) -o $(APP) -L/usr/lib/gcc/i686-linux-gnu/5 --start-group $(OBJS) $(LIB_FILES) /usr/lib/gcc/i686-linux-gnu/5/libgcc.a --end-group
 endif
 
 .PHONY: install run clean
