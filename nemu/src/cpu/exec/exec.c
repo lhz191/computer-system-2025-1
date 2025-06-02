@@ -267,10 +267,10 @@ opcode_entry opcode_table [512] = {
   /* 0x88 */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
   /*Pa2.3 benchmark 0x0f 8c-8f: jmp rel8*/
   /* 0x8c */	IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc), IDEX(J, jcc),
-  /* 0x90 */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /* 0x90 */	EMPTY, EMPTY, EMPTY, IDEXW(E, setcc, 1), /* SETAE/SETNB (0F 93) */
   /*0x0f 94 setcc*/
   /*Pa5: 实现SETBE(0F 96)条件设置指令。SETBE指令检查CF或ZF是否为1。*/
-  /* 0x94 */	IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1), IDEXW(E, setcc, 1), EMPTY,
+  /* 0x94 */	IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1), IDEXW(E, setcc, 1), EMPTY, /* SETBE (0F 96) */
   /* 0x98 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.3 benchmark 0x0f 9f: setcc*/
   /* 0x9c */	EMPTY, EMPTY, IDEXW(gp7_E, setcc, 1), IDEXW(gp7_E, setcc, 1),
