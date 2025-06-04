@@ -4,16 +4,32 @@
 #include <stdio.h>
 
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
-  printf("F_mul_F: %f * %f = ", (float)a/65536, (float)b/65536);
   if (a == 0 || b == 0) {
     return 0;
   }
-  //为了防止这个中间乘积溢出32位，所以用了 int64_t
+
   int64_t temp_prod = (int64_t)a * b;
+
+  const int64_t min_val_scaled = (int64_t)INT32_MIN << 16;
+  const int64_t max_val_scaled = (int64_t)INT32_MAX << 16;
+
+  if (temp_prod < min_val_scaled) {
+    return INT32_MIN;
+  }
+  if (temp_prod > max_val_scaled) {
+    return INT32_MAX;
+  }
+
   FLOAT result = (FLOAT)(temp_prod >> 16);
-  printf("%f\n", (float)result/65536);
+  int coerced_to_one = 0; // Flag
+  
+  if (result == 0 && temp_prod > 0 && temp_prod < (1LL << 16)) {
+      result = 1; 
+      coerced_to_one = 1; // Set flag
+  }
   return result;
 }
+
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
     assert(b != 0);
@@ -110,6 +126,7 @@ FLOAT Fabs(FLOAT a) {
   return (a < 0) ? -a : a;
 }
 
+//以下实验中没要求，为扩展实现
 FLOAT Fsqrt(FLOAT x) {
   FLOAT dt, t = int2F(2);
   int iteration_count = 0;
