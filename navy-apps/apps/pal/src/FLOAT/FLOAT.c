@@ -27,7 +27,7 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   //     result = 1; 
   //     coerced_to_one = 1; // Set flag
   // }
-  printf("%f\n", (float)result/65536);
+  // printf("%f\n", (float)result/65536);
   return result;
 }
 
