@@ -7,7 +7,7 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   if (a == 0 || b == 0) {
     return 0;
   }
-  printf("F_mul_F: %d * %d = ", a , b ); 
+  printf("F_mul_F: %d * %d = ", a >> 16, b >> 16);
   int64_t temp_prod = (int64_t)a * b;
 
   const int64_t min_val_scaled = (int64_t)INT32_MIN << 16;
@@ -34,7 +34,7 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
     assert(b != 0);
-    printf("F_div_F: %f / %f = ", (float)a/65536, (float)b/65536);
+    printf("F_div_F: %d / %d = ", a >> 16, b >> 16);
     int64_t temp_a = (int64_t)a << 16;
     int64_t quotient = temp_a / b;    
 
@@ -46,7 +46,7 @@ FLOAT F_div_F(FLOAT a, FLOAT b) {
     }
 
     FLOAT result = (FLOAT)quotient;
-    printf("%f\n", (float)result/65536);
+    printf("%d\n", result >> 16);
     return result;
 }
 
