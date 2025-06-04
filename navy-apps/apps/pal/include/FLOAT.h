@@ -29,7 +29,7 @@ FLOAT f2F(float);
 FLOAT F_mul_F(FLOAT, FLOAT);
 FLOAT F_div_F(FLOAT, FLOAT);
 FLOAT Fabs(FLOAT);
-// FLOAT Fsqrt(FLOAT);
-// FLOAT Fpow(FLOAT, FLOAT);
+FLOAT Fsqrt(FLOAT);
+FLOAT Fpow(FLOAT, FLOAT);
 
 #endif

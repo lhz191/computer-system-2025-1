@@ -4,21 +4,20 @@
 #include <stdio.h>
 
 FLOAT F_mul_F(FLOAT a, FLOAT b) {
-  printf("F_mul_F input: a = %d (0x%x), b = %d (0x%x)\\n", a, a, b, b);
-
+  printf("F_mul_F: %f * %f = ", (float)a/65536, (float)b/65536);
   if (a == 0 || b == 0) {
     return 0;
   }
   //为了防止这个中间乘积溢出32位，所以用了 int64_t
   int64_t temp_prod = (int64_t)a * b;
   FLOAT result = (FLOAT)(temp_prod >> 16);
-  printf("F_mul_F: result (temp_prod >> 16) = %d (0x%x)\\n", result, result);
+  printf("%f\n", (float)result/65536);
   return result;
 }
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
     assert(b != 0);
-
+    printf("F_div_F: %f / %f = ", (float)a/65536, (float)b/65536);
     int64_t temp_a = (int64_t)a << 16;
     int64_t quotient = temp_a / b;    
 
@@ -30,6 +29,7 @@ FLOAT F_div_F(FLOAT a, FLOAT b) {
     }
 
     FLOAT result = (FLOAT)quotient;
+    printf("%f\n", (float)result/65536);
     return result;
 }
 
@@ -110,67 +110,66 @@ FLOAT Fabs(FLOAT a) {
   return (a < 0) ? -a : a;
 }
 
-//以下实验中没要求，为扩展实现
-// FLOAT Fsqrt(FLOAT x) {
-//   FLOAT dt, t = int2F(2);
-//   int iteration_count = 0;
-//   const int max_iterations = 1000;
+FLOAT Fsqrt(FLOAT x) {
+  FLOAT dt, t = int2F(2);
+  int iteration_count = 0;
+  const int max_iterations = 1000;
 
-//   FLOAT loop_limit = f2F(1e-4); // Expected to be 6 for 1e-4
+  FLOAT loop_limit = f2F(1e-4); // Expected to be 6 for 1e-4
 
-//   do {
-//     FLOAT prev_t = t;
-//     FLOAT term1 = F_div_F(x, t);
-//     FLOAT term_diff = term1 - t;
-//     dt = F_div_int(term_diff, 2);
+  do {
+    FLOAT prev_t = t;
+    FLOAT term1 = F_div_F(x, t);
+    FLOAT term_diff = term1 - t;
+    dt = F_div_int(term_diff, 2);
 
-//     t += dt;
-//     iteration_count++;
+    t += dt;
+    iteration_count++;
 
-//     if (iteration_count > max_iterations) {
-//         break;
-//     }
-//     if (dt == 0 && prev_t == t) { //找到精确解
-//         break;
-//     }
+    if (iteration_count > max_iterations) {
+        break;
+    }
+    if (dt == 0 && prev_t == t) { //找到精确解
+        break;
+    }
 
-//   } while(Fabs(dt) > loop_limit);//差距/2小于1e-4时，停止迭代
-//   return t;
-// }
+  } while(Fabs(dt) > loop_limit);//差距/2小于1e-4时，停止迭代
+  return t;
+}
 
-// FLOAT Fpow(FLOAT x, FLOAT y) {
-//   // 处理特殊情况
-//   if (x == 0) return 0;
-//   if (x < 0) return 0;  // 暂时不处理负数
+FLOAT Fpow(FLOAT x, FLOAT y) {
+  // 处理特殊情况
+  if (x == 0) return 0;
+  if (x < 0) return 0;  // 暂时不处理负数
   
-//   FLOAT t2, dt, t = int2F(2);
-//   int iteration_count = 0;
-//   const int max_iterations = 1000; // Safety break
+  FLOAT t2, dt, t = int2F(2);
+  int iteration_count = 0;
+  const int max_iterations = 1000; // Safety break
 
-//   FLOAT loop_limit = f2F(1e-4); // Expected to be 6
-//   do {
-//     FLOAT prev_t = t;
-//     t2 = F_mul_F(t, t);
-//     if (t2 == 0) {  // 如果t2变得太小，停止迭代
-//       return prev_t;
-//     }
-//     FLOAT term1 = F_div_F(x, t2);
-//     FLOAT term_diff = term1 - t;
-//     dt = F_div_int(term_diff, 3);
-//     // 如果dt太小，提前结束
-//     if (dt == 0) {
-//       return t;
-//     }
+  FLOAT loop_limit = f2F(1e-4); // Expected to be 6
+  do {
+    FLOAT prev_t = t;
+    t2 = F_mul_F(t, t);
+    if (t2 == 0) {  // 如果t2变得太小，停止迭代
+      return prev_t;
+    }
+    FLOAT term1 = F_div_F(x, t2);
+    FLOAT term_diff = term1 - t;
+    dt = F_div_int(term_diff, 3);
+    // 如果dt太小，提前结束
+    if (dt == 0) {
+      return t;
+    }
     
-//     t += dt;
-//     iteration_count++;
-//     if (iteration_count > max_iterations) {
-//       break;
-//     }
-//     if (prev_t == t) {
-//       break;
-//     }
+    t += dt;
+    iteration_count++;
+    if (iteration_count > max_iterations) {
+      break;
+    }
+    if (prev_t == t) {
+      break;
+    }
 
-//   } while(Fabs(dt) > loop_limit);
-//   return t;
-// }
+  } while(Fabs(dt) > loop_limit);
+  return t;
+}
