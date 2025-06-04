@@ -7,7 +7,7 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   if (a == 0 || b == 0) {
     return 0;
   }
-
+  printf("F_mul_F: %f * %f = ", (float)a/65536, (float)b/65536);
   int64_t temp_prod = (int64_t)a * b;
 
   const int64_t min_val_scaled = (int64_t)INT32_MIN << 16;
@@ -23,10 +23,11 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   FLOAT result = (FLOAT)(temp_prod >> 16);
   int coerced_to_one = 0; // Flag
   
-  if (result == 0 && temp_prod > 0 && temp_prod < (1LL << 16)) {
-      result = 1; 
-      coerced_to_one = 1; // Set flag
-  }
+  // if (result == 0 && temp_prod > 0 && temp_prod < (1LL << 16)) {
+  //     result = 1; 
+  //     coerced_to_one = 1; // Set flag
+  // }
+  printf("%f\n", (float)result/65536);
   return result;
 }
 
