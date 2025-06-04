@@ -7,7 +7,7 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   if (a == 0 || b == 0) {
     return 0;
   }
-  printf("F_mul_F: %f * %f = ", (float)a/65536, (float)b/65536);
+  // printf("F_mul_F: %f * %f = ", (float)a/65536, (float)b/65536);
   int64_t temp_prod = (int64_t)a * b;
 
   const int64_t min_val_scaled = (int64_t)INT32_MIN << 16;
