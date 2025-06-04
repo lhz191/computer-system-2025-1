@@ -7,7 +7,12 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   if (a == 0 || b == 0) {
     return 0;
   }
-  printf("F_mul_F: %d * %d = ", a >> 16, b >> 16);
+  // 分别打印a和b的整数和小数部分
+  printf("F_mul_F: %d.%04d * %d.%04d = ", 
+         a >> 16, 
+         (int)((a & 0xFFFF) * 10000LL >> 16),
+         b >> 16, 
+         (int)((b & 0xFFFF) * 10000LL >> 16));
   int64_t temp_prod = (int64_t)a * b;
 
   const int64_t min_val_scaled = (int64_t)INT32_MIN << 16;
@@ -21,20 +26,22 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
   }
 
   FLOAT result = (FLOAT)(temp_prod >> 16);
-  int coerced_to_one = 0; // Flag
-  
-  // if (result == 0 && temp_prod > 0 && temp_prod < (1LL << 16)) {
-  //     result = 1; 
-  //     coerced_to_one = 1; // Set flag
-  // }
-  printf("%d\n", result >> 16);  // 只显示整数部分
+  // 打印结果的整数和小数部分
+  printf("%d.%04d\n", 
+         result >> 16,
+         (int)((result & 0xFFFF) * 10000LL >> 16));
   return result;
 }
 
 
 FLOAT F_div_F(FLOAT a, FLOAT b) {
     assert(b != 0);
-    printf("F_div_F: %d / %d = ", a >> 16, b >> 16);
+    // 分别打印a和b的整数和小数部分
+    printf("F_div_F: %d.%04d / %d.%04d = ", 
+           a >> 16, 
+           (int)((a & 0xFFFF) * 10000LL >> 16),
+           b >> 16, 
+           (int)((b & 0xFFFF) * 10000LL >> 16));
     int64_t temp_a = (int64_t)a << 16;
     int64_t quotient = temp_a / b;    
 
@@ -46,7 +53,10 @@ FLOAT F_div_F(FLOAT a, FLOAT b) {
     }
 
     FLOAT result = (FLOAT)quotient;
-    printf("%d\n", result >> 16);
+    // 打印结果的整数和小数部分
+    printf("%d.%04d\n", 
+           result >> 16,
+           (int)((result & 0xFFFF) * 10000LL >> 16));
     return result;
 }
 
