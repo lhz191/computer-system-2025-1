@@ -208,9 +208,9 @@ opcode_entry opcode_table [512] = {
   /* 0xd0 */	IDEXW(gp2_1_E, gp2, 1), IDEX(gp2_1_E, gp2), IDEXW(gp2_cl2E, gp2, 1), IDEX(gp2_cl2E, gp2),
   /* 0xd4 */	EMPTY, EMPTY, EX(nemu_trap), EMPTY,
   /*Pa5：0xd8 fld指令*/
-  /* 0xd8 */	EMPTY, EMPTY,EMPTY, EMPTY,
+  /* 0xd8 */	EMPTY, IDEX(E, fld), IDEX(E, fld), EMPTY,
   /*Pa5:0xdd fld指令*/
-  /* 0xdc */	EMPTY, EMPTY, EMPTY, EMPTY,
+  /* 0xdc */	EMPTY, IDEX(E, fld), EMPTY, IDEX(E, fld),
   /* 0xe0 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /* 0xe4 */	EMPTY, EMPTY, EMPTY, EMPTY,
   /*Pa2.1 Begin*/

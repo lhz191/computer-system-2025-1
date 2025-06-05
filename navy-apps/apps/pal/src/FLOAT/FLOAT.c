@@ -61,55 +61,66 @@ FLOAT F_div_F(FLOAT a, FLOAT b) {
 }
 
 FLOAT f2F(float ft) {
-  // 1. 初始的浮点比较：
-  // 这个比较仍然是浮点操作。
-  // 如果想完全避免，可以先获取位表示 val，然后判断 val 是否为0的位表示。
-  if (ft == 0.0f) { 
+  if (ft == 0.0f) {
     return 0;
   }
 
   uint32_t val;
-  
-  // 2. 获取 float ft 的32位整数表示：
-  // 不使用 union，改用指针转换的方式
-  val = *(uint32_t *)&ft; 
-  // 或者使用 memcpy (更安全，避免严格别名违规，尽管对于简单类型转换通常编译器会优化好):
-  // memcpy(&val, &ft, sizeof(val));
+  // 使用 union 获取 float 的位表示，避免直接浮点运算
+  union {
+    float f_val;
+    uint32_t u_val;
+  } float_converter;
 
-  // 3. 从这里开始，后续的转换逻辑完全基于整数 val 的位操作：
-  // 这部分代码和你原来的一样，它不依赖C语言的浮点算术运算。
-  int sign_bit = (val >> 31) & 1;
-  int exponent_bits = (val >> 23) & 0xFF;
-  uint32_t fraction_bits = val & 0x7FFFFF;
+  float_converter.f_val = ft;
+  val = float_converter.u_val;
+
+  int sign_bit = (val >> 31) & 1;         // 符号位
+  int exponent_bits = (val >> 23) & 0xFF; // 指数部分 (8位)
+  uint32_t fraction_bits = val & 0x7FFFFF; // 尾数部分 (23位)
+
   FLOAT result_unsigned;
 
-  if (exponent_bits == 0xFF) {
+  if (exponent_bits == 0xFF) { // 无穷大或NaN，指数为255-127=128
+    //如果尾数全0：±∞ (正无穷或负无穷，取决于符号位)
+    //如果尾数不全0：NaN (Not a Number)特殊规定
+    // result_unsigned = 0;
     assert(0 && "Error: Cannot convert Inf/NaN to FLOAT");
   } 
-  else if (exponent_bits == 0) {
+  else if (exponent_bits == 0) { // 非规格化数或零。指数为0-127=-127
     if (fraction_bits == 0) {
         result_unsigned = 0;
     } else {
-        result_unsigned = 0; // 对于非规格化数，这里也处理为0
+        result_unsigned = 0;
     }
   } 
-  else {
+  else { // 规格化数
+    // 实际指数 = exponent_bits - 127
     int actual_exponent = exponent_bits - 127;
+    // 实际尾数 (包含隐含的1) = (1 << 23) | fraction_bits (24位整数)
     uint32_t actual_mantissa = (1 << 23) | fraction_bits;
-    int shift = actual_exponent - 7; // (23 - 16)
+    // IEEE-754:
+    // 4.0 = 1.0 × 2^2
+    // actual_exponent = 2
+    // actual_mantissa = 2^23
+
+    // FLOAT需要:
+    // 4.0 × 2^16 = 2^18
+
+    // 需要的移位 = 18 - 23 = -5
+    // = actual_exponent(2) - 7
+    //这个7是float的尾数位数23-Float的偏移位数16=7，本来要左移7位，但有指数，所以左移指数-7位，指数每大一，便少移一位
+    int shift = actual_exponent - 7;
 
     if (shift >= 0) {
-      if (shift < 31) { // 防止溢出到符号位或完全移出
+      if (shift < 31) {
           result_unsigned = actual_mantissa << shift;
       } else {
-          // 如果左移位数过多，导致结果超出FLOAT能表达的正数范围（或变为0，如果符号也移没了）
-          // 根据你的FLOAT定义，可能需要一个饱和值或就设为0
-          result_unsigned = (actual_mantissa == 0) ? 0 : 0x7FFFFFFF;
-          if (shift >= 31 && actual_mantissa != 0) { /* 可能表示溢出 */ } else { result_unsigned = 0; }
+          result_unsigned = 0;
       }
     } else {
       int rshift = -shift;
-      if (rshift < 32) { // 考虑实际尾数是24位，如果右移过多也会变0
+      if (rshift < 32) {
           result_unsigned = actual_mantissa >> rshift;
       } else {
           result_unsigned = 0;
