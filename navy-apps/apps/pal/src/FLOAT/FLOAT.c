@@ -34,30 +34,57 @@ FLOAT F_mul_F(FLOAT a, FLOAT b) {
 }
 
 
+// FLOAT F_div_F(FLOAT a, FLOAT b) {
+//     assert(b != 0);
+//     // 分别打印a和b的整数和小数部分
+//     printf("F_div_F: %d.%04d / %d.%04d = ", 
+//            a >> 16, 
+//            (int)((a & 0xFFFF) * 10000LL >> 16),
+//            b >> 16, 
+//            (int)((b & 0xFFFF) * 10000LL >> 16));
+//     int64_t temp_a = (int64_t)a << 16;
+//     int64_t quotient = temp_a / b;    
+
+//     if (quotient < INT32_MIN) {
+//         return INT32_MIN;
+//     }
+//     if (quotient > INT32_MAX) {
+//         return INT32_MAX;
+//     }
+
+//     FLOAT result = (FLOAT)quotient;
+//     // 打印结果的整数和小数部分
+//     printf("%d.%04d\n", 
+//            result >> 16,
+//            (int)((result & 0xFFFF) * 10000LL >> 16));
+//     return result;
+// }
+
 FLOAT F_div_F(FLOAT a, FLOAT b) {
     assert(b != 0);
-    // 分别打印a和b的整数和小数部分
-    printf("F_div_F: %d.%04d / %d.%04d = ", 
-           a >> 16, 
-           (int)((a & 0xFFFF) * 10000LL >> 16),
-           b >> 16, 
-           (int)((b & 0xFFFF) * 10000LL >> 16));
-    int64_t temp_a = (int64_t)a << 16;
-    int64_t quotient = temp_a / b;    
 
-    if (quotient < INT32_MIN) {
-        return INT32_MIN;
-    }
-    if (quotient > INT32_MAX) {
-        return INT32_MAX;
+    // 32-bit only fixed-point division (Q16.16) using Newton-Raphson method.
+    // It calculates a/b by first finding 1/b and then multiplying by a.
+    // The formula for the reciprocal is: x_{n+1} = x_n * (2 - b * x_n)
+
+    if (a == 0) return 0;
+    
+    // An initial guess for 1/b is crucial for convergence.
+    // A simple but slow-converging guess is 1.0. For faster convergence,
+    // a lookup table or bit manipulation for a better initial guess is recommended.
+    FLOAT x = 1 << 16; // Initial guess for 1/b (as 1.0)
+    
+    // Pre-calculate 2.0 in Q16.16 format
+    FLOAT two = 2 << 16;
+
+    // Iterate to improve the precision of the reciprocal.
+    // The number of iterations affects precision. 8-12 is often sufficient.
+    for (int i = 0; i < 10; i++) {
+        x = F_mul_F(x, two - F_mul_F(b, x));
     }
 
-    FLOAT result = (FLOAT)quotient;
-    // 打印结果的整数和小数部分
-    printf("%d.%04d\n", 
-           result >> 16,
-           (int)((result & 0xFFFF) * 10000LL >> 16));
-    return result;
+    // Final result is a * (1/b)
+    return F_mul_F(a, x);
 }
 
 FLOAT f2F(float ft) {
