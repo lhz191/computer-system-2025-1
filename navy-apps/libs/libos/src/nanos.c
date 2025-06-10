@@ -36,13 +36,6 @@ extern char _end;
 static uintptr_t program_break = 0;
 
    void *_sbrk(intptr_t increment) {
-     if (program_break == 0) {
-       // 初始化为更高的地址，避免使用过低的地址
-       program_break = (uintptr_t)&_end;
-       if (program_break < 0x100000) {  // 确保至少从1MB开始
-         program_break = 0x100000;
-       }
-     }
      uintptr_t old_break = program_break;
      uintptr_t new_break = program_break + increment;
      int ret = _syscall_(SYS_brk, new_break, 0, 0);
